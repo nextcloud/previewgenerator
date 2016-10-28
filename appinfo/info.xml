@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<info>
+	<id>previewgenerator</id>
+	<name>Preview Generator</name>
+	<description>
+		Command line app to pre-generate previews.
+	</description>
+	<licence>AGPL</licence>
+	<author>Roeland Jago Douma</author>
+	<version>0.0.1</version>
+	<namespace>PreviewGenerator</namespace>
+	<dependencies>
+		<owncloud min-version="9.2" max-version="9.2" />
+	</dependencies>
+
+	<commands>
+		<command>OCA\PreviewGenerator\Command\Generate</command>
+	</commands>
+</info>
