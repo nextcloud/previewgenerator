@@ -45,7 +45,7 @@ class DeleteOld extends Command {
 	 * @param IUserManager $userManager
 	 */
 	public function __construct(IRootFolder $rootFolder,
-						 IUserManager $userManager) {
+								IUserManager $userManager) {
 		parent::__construct();
 
 		$this->userManager = $userManager;
