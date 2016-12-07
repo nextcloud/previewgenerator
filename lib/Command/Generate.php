@@ -49,7 +49,7 @@ class Generate extends Command {
 	/** @var IConfig */
 	protected $config;
 
-	/** @var array */
+	/** @var int[][] */
 	protected $sizes;
 
 
@@ -59,7 +59,7 @@ class Generate extends Command {
 	 * @param IPreview $previewGenerator
 	 * @param IConfig $config
 	 */
-	function __construct(IRootFolder $rootFolder,
+	public function __construct(IRootFolder $rootFolder,
 						 IUserManager $userManager,
 						 IPreview $previewGenerator,
 						 IConfig $config) {
@@ -73,7 +73,7 @@ class Generate extends Command {
 
 	protected function configure() {
 		$this
-			->setName('preview:generate')
+			->setName('preview:generate-all')
 			->setDescription('Generate previews')
 			->addArgument(
 				'user_id',

@@ -3,12 +3,15 @@
 	<id>previewgenerator</id>
 	<name>Preview Generator</name>
 	<description>
-		Command line app to pre-generate previews.
+		App to pre-generate previews.
 	</description>
 	<licence>AGPL</licence>
 	<author>Roeland Jago Douma</author>
-	<version>0.0.2</version>
+	<version>0.0.7</version>
 	<namespace>PreviewGenerator</namespace>
+	<types>
+		<filesystem/>
+	</types>
 	<dependencies>
 		<nextcloud min-version="11" max-version="11" />
 	</dependencies>
@@ -16,5 +19,6 @@
 	<commands>
 		<command>OCA\PreviewGenerator\Command\Generate</command>
 		<command>OCA\PreviewGenerator\Command\DeleteOld</command>
+		<command>OCA\PreviewGenerator\Command\PreGenerate</command>
 	</commands>
 </info>
