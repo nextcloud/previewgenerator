@@ -13,7 +13,7 @@
 		<whitelist>
 			<directory suffix=".php">../</directory>
 			<exclude>
-				<directory suffix=".php">../previewgenerator/tests</directory>
+				<directory suffix=".php">../tests</directory>
 			</exclude>
 		</whitelist>
 	</filter>
