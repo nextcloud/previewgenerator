@@ -34,6 +34,12 @@ class Watcher {
 	/** @var IUserManager */
 	private $userManager;
 
+	/**
+	 * Watcher constructor.
+	 *
+	 * @param IDBConnection $connection
+	 * @param IUserManager $userManager
+	 */
 	public function __construct(IDBConnection $connection,
 								IUserManager $userManager) {
 		$this->connection = $connection;

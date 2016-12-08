@@ -30,6 +30,12 @@ use OCP\Files\Node;
 
 class Application extends App {
 
+	/**
+	 * Application constructor.
+	 *
+	 * @param string $appName
+	 * @param array $urlParams
+	 */
 	public function __construct($appName, array $urlParams = []) {
 		parent::__construct($appName, $urlParams);
 
@@ -37,6 +43,9 @@ class Application extends App {
 		$this->connectWatcher($container);
 	}
 
+	/**
+	 * @param IAppContainer $container
+	 */
 	private function connectWatcher(IAppContainer $container) {
 		/** @var IRootFolder $root */
 		$root = $container->query(IRootFolder::class);
