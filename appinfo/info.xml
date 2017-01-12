@@ -22,7 +22,7 @@ The app does not replace on demand preview generation so if a preview is request
 	</types>
 	<dependencies>
 		<php min-version="5.6"/>
-		<nextcloud min-version="11" max-version="11" />
+		<nextcloud min-version="11" max-version="12" />
 	</dependencies>
 
 	<commands>
