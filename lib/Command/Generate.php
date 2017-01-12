@@ -49,6 +49,9 @@ class Generate extends Command {
 	/** @var IConfig */
 	protected $config;
 
+	/** @var OutputInterface */
+	protected $output;
+
 	/** @var int[][] */
 	protected $sizes;
 
@@ -88,6 +91,8 @@ class Generate extends Command {
 	 * @return int
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
+		$this->output = $output;
+
 		$userId = $input->getArgument('user_id');
 		$this->calculateSizes();
 
@@ -146,6 +151,8 @@ class Generate extends Command {
 	 * @param Folder $folder
 	 */
 	private function parseFolder(Folder $folder) {
+		$this->output->writeln('Scanning folder ' . $folder->getPath());
+
 		$nodes = $folder->getDirectoryListing();
 
 		foreach ($nodes as $node) {
@@ -162,6 +169,10 @@ class Generate extends Command {
 	 */
 	private function parseFile(File $file) {
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
+			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
+				$this->output->writeln('Generating previews for ' . $file->getPath());
+			}
+
 			try {
 				foreach ($this->sizes['square'] as $size) {
 					$this->previewGenerator->getPreview($file, $size, $size, true);
