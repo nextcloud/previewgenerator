@@ -115,13 +115,16 @@ class PreGenerate extends Command {
 			}
 
 			foreach ($rows as $row) {
-				$this->processRow($row);
-
-				// Delete row
+				/*
+				 * First delete the row so that if preview generation fails for some reason
+				 * the next run can just continue
+				 */
 				$qb = $this->connection->getQueryBuilder();
 				$qb->delete('preview_generation')
 					->where($qb->expr()->eq('id', $qb->createNamedParameter($row['id'])));
 				$qb->execute();
+
+				$this->processRow($row);
 			}
 		}
 	}
