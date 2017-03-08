@@ -51,6 +51,9 @@ class PreGenerate extends Command {
 	/** @var IDBConnection */
 	protected $connection;
 
+	/** @var OutputInterface */
+	protected $output;
+
 	/** @var int[][] */
 	protected $sizes;
 
@@ -87,6 +90,8 @@ class PreGenerate extends Command {
 	 * @return int
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
+		$this->output = $output;
+
 		$this->calculateSizes();
 		$this->startProcessing();
 
@@ -153,6 +158,10 @@ class PreGenerate extends Command {
 
 	private function processFile(File $file) {
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
+			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
+				$this->output->writeln('Generating previews for ' . $file->getPath());
+			}
+
 			try {
 				foreach ($this->sizes['square'] as $size) {
 					$this->previewGenerator->getPreview($file, $size, $size, true);
@@ -174,6 +183,10 @@ class PreGenerate extends Command {
 	}
 
 	private function processFolder(Folder $folder) {
+		if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
+			$this->output->writeln('Generating previews for folder ' . $folder->getPath());
+		}
+
 		$nodes = $folder->getDirectoryListing();
 
 		foreach ($nodes as $node) {
