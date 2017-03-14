@@ -22,6 +22,7 @@
 	 */
 namespace OCA\PreviewGenerator\Command;
 
+use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
 use OCP\Files\Folder;
@@ -36,6 +37,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PreGenerate extends Command {
+
+	/** @var string */
+	protected $appName;
 
 	/** @var IUserManager */
 	protected $userManager;
@@ -61,28 +65,37 @@ class PreGenerate extends Command {
 	/** @var IManager */
 	protected $encryptionManager;
 
+	/** @var ITimeFactory */
+	protected $time;
+
 	/**
+	 * @param string $appName
 	 * @param IRootFolder $rootFolder
 	 * @param IUserManager $userManager
 	 * @param IPreview $previewGenerator
 	 * @param IConfig $config
 	 * @param IDBConnection $connection
 	 * @param IManager $encryptionManager
+	 * @param ITimeFactory $time
 	 */
-	public function __construct(IRootFolder $rootFolder,
+	public function __construct($appName,
+						 IRootFolder $rootFolder,
 						 IUserManager $userManager,
 						 IPreview $previewGenerator,
 						 IConfig $config,
 						 IDBConnection $connection,
-						 IManager $encryptionManager) {
+						 IManager $encryptionManager,
+						 ITimeFactory $time) {
 		parent::__construct();
 
+		$this->appName = $appName;
 		$this->userManager = $userManager;
 		$this->rootFolder = $rootFolder;
 		$this->previewGenerator = $previewGenerator;
 		$this->config = $config;
 		$this->connection = $connection;
 		$this->encryptionManager = $encryptionManager;
+		$this->time = $time;
 	}
 
 	protected function configure() {
@@ -102,10 +115,20 @@ class PreGenerate extends Command {
 			return 1;
 		}
 
+		$lastActivity = (int)$this->config->getAppValue($this->appName, 'lastActivity', 0);
+
+		if (($this->time->getTime() - $lastActivity) < 30 * 60 * 60) {
+			$output->writeln('Command is already running.');
+			return 2;
+		}
+
+		$this->updateLastActivity();
 		$this->output = $output;
 
 		$this->calculateSizes();
 		$this->startProcessing();
+
+		$this->clearLastActivity();
 
 		return 0;
 	}
@@ -195,6 +218,8 @@ class PreGenerate extends Command {
 				// Maybe log that previews could not be generated?
 			}
 		}
+
+		$this->updateLastActivity();
 	}
 
 	private function processFolder(Folder $folder) {
@@ -237,5 +262,13 @@ class PreGenerate extends Command {
 			$this->sizes['height'][] = $h;
 			$h *= 2;
 		}
+	}
+
+	private function updateLastActivity() {
+		$this->config->setAppValue($this->appName, 'lastActivity', $this->time->getTime());
+	}
+
+	private function clearLastActivity() {
+		$this->config->deleteAppValue($this->appName, 'lastActivity');
 	}
 }
