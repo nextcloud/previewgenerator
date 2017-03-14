@@ -20,4 +20,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-$app = new \OCA\PreviewGenerator\AppInfo\Application('PreviewGenerator');
+$app = new \OCA\PreviewGenerator\AppInfo\Application('previewgenerator');
