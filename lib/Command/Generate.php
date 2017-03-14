@@ -22,6 +22,7 @@
  */
 namespace OCA\PreviewGenerator\Command;
 
+use OCP\Encryption\IManager;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
@@ -55,23 +56,29 @@ class Generate extends Command {
 	/** @var int[][] */
 	protected $sizes;
 
+	/** @var IManager */
+	protected $encryptionManager;
+
 
 	/**
 	 * @param IRootFolder $rootFolder
 	 * @param IUserManager $userManager
 	 * @param IPreview $previewGenerator
 	 * @param IConfig $config
+	 * @param IManager $encryptionManager
 	 */
 	public function __construct(IRootFolder $rootFolder,
 						 IUserManager $userManager,
 						 IPreview $previewGenerator,
-						 IConfig $config) {
+						 IConfig $config,
+						 IManager $encryptionManager) {
 		parent::__construct();
 
 		$this->userManager = $userManager;
 		$this->rootFolder = $rootFolder;
 		$this->previewGenerator = $previewGenerator;
 		$this->config = $config;
+		$this->encryptionManager = $encryptionManager;
 	}
 
 	protected function configure() {
@@ -91,6 +98,11 @@ class Generate extends Command {
 	 * @return int
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
+		if ($this->encryptionManager->isEnabled()) {
+			$output->writeln('Encryption is enabled. Aborted.');
+			return 1;
+		}
+
 		$this->output = $output;
 
 		$userId = $input->getArgument('user_id');
