@@ -11,7 +11,7 @@ The app does not replace on demand preview generation so if a preview is request
 	</description>
 	<licence>AGPL</licence>
 	<author>Roeland Jago Douma</author>
-	<version>1.0.3</version>
+	<version>1.0.5</version>
 	<namespace>PreviewGenerator</namespace>
 	<category>multimedia</category>
 	<website>https://github.com/rullzer/previewgenerator</website>
