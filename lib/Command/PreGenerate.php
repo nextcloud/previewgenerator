@@ -240,16 +240,19 @@ class PreGenerate extends Command {
 
 	private function calculateSizes() {
 		$this->sizes = [
-			'square' => [
-				32,
-				64,
-			],
+			'square' => [],
 			'height' => [],
 			'width' => [],
 		];
 
 		$maxW = (int)$this->config->getSystemValue('preview_max_x', 2048);
 		$maxH = (int)$this->config->getSystemValue('preview_max_y', 2048);
+
+		$s = 32;
+		while($s <= $maxW || $s <= $maxH) {
+			$this->sizes['square'][] = $s;
+			$s *= 2;
+		}
 
 		$w = 32;
 		while($w <= $maxW) {
