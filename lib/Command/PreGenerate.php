@@ -34,6 +34,7 @@ use OCP\IPreview;
 use OCP\IUserManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PreGenerate extends Command {
@@ -101,7 +102,12 @@ class PreGenerate extends Command {
 	protected function configure() {
 		$this
 			->setName('preview:pre-generate')
-			->setDescription('Pre generate previews');
+			->setDescription('Pre generate previews')
+			->addOption(
+				'force',
+				null,
+				InputOption::VALUE_NONE,
+				'Do not check for already running processes');
 	}
 
 	/**
@@ -115,11 +121,13 @@ class PreGenerate extends Command {
 			return 1;
 		}
 
-		$lastActivity = (int)$this->config->getAppValue($this->appName, 'lastActivity', 0);
+		if (!$input->getOption('force')) {
+			$lastActivity = (int)$this->config->getAppValue($this->appName, 'lastActivity', 0);
 
-		if (($this->time->getTime() - $lastActivity) < 30 * 60) {
-			$output->writeln('Command is already running.');
-			return 2;
+			if (($this->time->getTime() - $lastActivity) < 30 * 60) {
+				$output->writeln('Command is already running.');
+				return 2;
+			}
 		}
 
 		$this->updateLastActivity();
