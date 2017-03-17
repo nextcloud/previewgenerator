@@ -117,7 +117,7 @@ class PreGenerate extends Command {
 
 		$lastActivity = (int)$this->config->getAppValue($this->appName, 'lastActivity', 0);
 
-		if (($this->time->getTime() - $lastActivity) < 30 * 60 * 60) {
+		if (($this->time->getTime() - $lastActivity) < 30 * 60) {
 			$output->writeln('Command is already running.');
 			return 2;
 		}
