@@ -224,6 +224,9 @@ class PreGenerate extends Command {
 				}
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
+			} catch (\InvalidArgumentException $e) {
+				$error = $e->getMessage();
+				$this->output->writeln("<error>${error}</error>");
 			}
 		}
 

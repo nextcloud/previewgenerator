@@ -20,6 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 namespace OCA\PreviewGenerator\Command;
 
 use OCP\Encryption\IManager;
@@ -68,10 +69,10 @@ class Generate extends Command {
 	 * @param IManager $encryptionManager
 	 */
 	public function __construct(IRootFolder $rootFolder,
-						 IUserManager $userManager,
-						 IPreview $previewGenerator,
-						 IConfig $config,
-						 IManager $encryptionManager) {
+								IUserManager $userManager,
+								IPreview $previewGenerator,
+								IConfig $config,
+								IManager $encryptionManager) {
 		parent::__construct();
 
 		$this->userManager = $userManager;
@@ -133,19 +134,19 @@ class Generate extends Command {
 		$maxH = (int)$this->config->getSystemValue('preview_max_y', 2048);
 
 		$s = 32;
-		while($s <= $maxW || $s <= $maxH) {
+		while ($s <= $maxW || $s <= $maxH) {
 			$this->sizes['square'][] = $s;
 			$s *= 2;
 		}
 
 		$w = 32;
-		while($w <= $maxW) {
+		while ($w <= $maxW) {
 			$this->sizes['width'][] = $w;
 			$w *= 2;
 		}
 
 		$h = 32;
-		while($h <= $maxH) {
+		while ($h <= $maxH) {
 			$this->sizes['height'][] = $h;
 			$h *= 2;
 		}
@@ -204,6 +205,9 @@ class Generate extends Command {
 				}
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
+			} catch (\InvalidArgumentException $e) {
+				$error = $e->getMessage();
+				$this->output->writeln("<error>${error}</error>");
 			}
 		}
 	}
