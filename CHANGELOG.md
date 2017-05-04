@@ -1,6 +1,12 @@
-## [Unreleased]
+## 1.0.6 - 2017-05-05
+
 ### Fixed
 - Better preview error handling [#51](https://github.com/rullzer/previewgenerator/pull/51) @icewind1991 
+- Travis test runs [#53](https://github.com/rullzer/previewgenerator/pull/53)
+
+### Added
+- README.md [#52](https://github.com/rullzer/previewgenerator/pull/52)
+- CHANGELOG.md [#52](https://github.com/rullzer/previewgenerator/pull/52)
 
 ## 1.0.5 - 2017-03-17
 
