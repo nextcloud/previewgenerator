@@ -2,29 +2,29 @@
 
 Nextcloud app that allows admins to pre-generate previews. The app listens to 
 edit events and stores this information. Once a cron job is triggered it will
-generate start preview generation. This means that you can better utilize your
+start preview generation. This means that you can better utilize your
 system by pre-generating previews when your system is normally idle and thus 
 putting less load on your machine when the requests are actually served.
 
 The app does not replace on demand preview generation so if a preview is 
 requested before it is pre-generated it will still be shown.
 
-## How to isntall
+## How to install
 
 * Install directly from within your Nextcloud from the [app store](https://apps.nextcloud.com/apps/previewgenerator)
-* Clone this reposotiry in you Nextcloud app folder
+* Clone this repository in you Nextcloud app folder
 
 ## How to use the app
 
 1. Install the app
 2. Enable the app
-3. Add a (sytem) cron job for ` ./occ preview:pre-generate`
+3. Add a (system) cron job for ` ./occ preview:pre-generate`
   * I run it every 10 minutes
 
 ## How does the app work
 
-1. Listen to events that a file has been writen or modified and store it in the database
-2. On cron run request previews for the files that have been writen or modified
+1. Listen to events that a file has been written or modified and store it in the database
+2. On cron run request previews for the files that have been written or modified
 
 If a preview already exists at step 2 then requesting it is really cheap. If not
 it will be generated. Depending on the sizes of the files and the hardware you
@@ -46,7 +46,7 @@ just loop over the files for that user.
 ### preview:pre-generate
 
 Do the actual pregeneration. This means only for new or modified files (since
-the app was enabled).
+the app was enabled or the last pregeneration was done).
 
 ## FAQ
 
@@ -57,7 +57,7 @@ does not time out.
 
 ### It sometimes crashed
 
-Yes this happens. Most of it is due corrupted files not being handled that gracefully
+Yes this happens. Most of it is due to corrupted files not being handled that gracefully
 in the Nextcloud server. Improvements in this area are coming with Nextcloud 12
 
 ### I get "Command already running"
