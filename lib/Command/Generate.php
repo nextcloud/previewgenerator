@@ -34,6 +34,7 @@ use OCP\IUser;
 use OCP\IUserManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -90,6 +91,12 @@ class Generate extends Command {
 				'user_id',
 				InputArgument::OPTIONAL,
 				'Generate previews for the given user'
+			)
+			->addOption(
+				'nomediacheck',
+				null,
+				InputOption::VALUE_NONE,
+				'Folders with .nomedia files are skipped'
 			);
 	}
 
@@ -109,14 +116,15 @@ class Generate extends Command {
 		$userId = $input->getArgument('user_id');
 		$this->calculateSizes();
 
+		$nomediacheck = $input->hasParameterOption('--nomediacheck');
 		if ($userId === null) {
-			$this->userManager->callForSeenUsers(function (IUser $user) {
-				$this->generateUserPreviews($user);
+			$this->userManager->callForSeenUsers(function (IUser $user) use ($nomediacheck) {
+				$this->generateUserPreviews($user, $nomediacheck);
 			});
 		} else {
 			$user = $this->userManager->get($userId);
 			if ($user !== null) {
-				$this->generateUserPreviews($user);
+				$this->generateUserPreviews($user, $nomediacheck);
 			}
 		}
 
@@ -155,25 +163,29 @@ class Generate extends Command {
 	/**
 	 * @param IUser $user
 	 */
-	private function generateUserPreviews(IUser $user) {
+	private function generateUserPreviews(IUser $user, $nomediacheck) {
 		\OC_Util::tearDownFS();
 		\OC_Util::setupFS($user->getUID());
 
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
-		$this->parseFolder($userFolder);
+		$this->parseFolder($userFolder, $nomediacheck);
 	}
 
 	/**
 	 * @param Folder $folder
 	 */
-	private function parseFolder(Folder $folder) {
+	private function parseFolder(Folder $folder, $nomediacheck) {
+		if ($nomediacheck && $folder->nodeExists('.nomedia')) {
+			$this->output->writeln('Skipping folder ' . $folder->getPath());
+			return;
+		}
 		$this->output->writeln('Scanning folder ' . $folder->getPath());
 
 		$nodes = $folder->getDirectoryListing();
 
 		foreach ($nodes as $node) {
 			if ($node instanceof Folder) {
-				$this->parseFolder($node);
+				$this->parseFolder($node, $nomediacheck);
 			} else if ($node instanceof File) {
 				$this->parseFile($node);
 			}
