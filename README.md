@@ -9,7 +9,7 @@ putting less load on your machine when the requests are actually served.
 The app does not replace on demand preview generation so if a preview is 
 requested before it is pre-generated it will still be shown.
 
-## How to isntall
+## How to install
 
 * Install directly from within your Nextcloud from the [app store](https://apps.nextcloud.com/apps/previewgenerator)
 * Clone this reposotiry in you Nextcloud app folder
