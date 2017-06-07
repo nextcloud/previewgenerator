@@ -205,7 +205,7 @@ class PreGenerate extends Command {
 	private function processFile(File $file) {
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
 			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
-				$this->output->writeln('Generating previews for ' . $file->getPath());
+				$this->output->writeln((extension_loaded('date') ? date('Y-m-d H:i:s ') : '') . 'Generating previews for ' . $file->getPath());
 			}
 
 			try {
@@ -235,7 +235,7 @@ class PreGenerate extends Command {
 
 	private function processFolder(Folder $folder) {
 		if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
-			$this->output->writeln('Generating previews for folder ' . $folder->getPath());
+			$this->output->writeln((extension_loaded('date') ? date('Y-m-d H:i:s ') : '') . 'Generating previews for folder ' . $folder->getPath());
 		}
 
 		$nodes = $folder->getDirectoryListing();
