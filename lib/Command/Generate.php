@@ -167,7 +167,7 @@ class Generate extends Command {
 	 * @param Folder $folder
 	 */
 	private function parseFolder(Folder $folder) {
-		$this->output->writeln('Scanning folder ' . $folder->getPath());
+		$this->output->writeln((extension_loaded('date') ? date('Y-m-d H:i:s ') : '') . 'Scanning folder ' . $folder->getPath());
 
 		$nodes = $folder->getDirectoryListing();
 
@@ -186,7 +186,7 @@ class Generate extends Command {
 	private function parseFile(File $file) {
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
 			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
-				$this->output->writeln('Generating previews for ' . $file->getPath());
+				$this->output->writeln((extension_loaded('date') ? date('Y-m-d H:i:s ') : '') . 'Generating previews for ' . $file->getPath());
 			}
 
 			try {
