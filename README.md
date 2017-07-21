@@ -21,6 +21,10 @@ requested before it is pre-generated it will still be shown.
 3. Add a (system) cron job for ` ./occ preview:pre-generate`
   * I run it every 10 minutes
 
+## Known issues
+
+* The app does not work with encryption enabled
+
 ## How does the app work
 
 1. Listen to events that a file has been written or modified and store it in the database
