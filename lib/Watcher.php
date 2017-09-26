@@ -22,6 +22,7 @@
  */
 namespace OCA\PreviewGenerator;
 
+use OCP\Files\Folder;
 use OCP\Files\Node;
 use OCP\IDBConnection;
 use OCP\IUserManager;
@@ -56,7 +57,7 @@ class Watcher {
 		$absPath = ltrim($node->getPath(), '/');
 		$owner = explode('/', $absPath)[0];
 
-		if (!$this->userManager->userExists($owner)) {
+		if (!$this->userManager->userExists($owner) || $node instanceof Folder) {
 			return;
 		}
 

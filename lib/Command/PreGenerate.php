@@ -25,7 +25,6 @@ namespace OCA\PreviewGenerator\Command;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
-use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IConfig;
@@ -197,8 +196,6 @@ class PreGenerate extends Command {
 		$node = $nodes[0];
 		if ($node instanceof File) {
 			$this->processFile($node);
-		} else {
-			$this->processFolder($node);
 		}
 	}
 
@@ -231,22 +228,6 @@ class PreGenerate extends Command {
 		}
 
 		$this->updateLastActivity();
-	}
-
-	private function processFolder(Folder $folder) {
-		if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
-			$this->output->writeln('Generating previews for folder ' . $folder->getPath());
-		}
-
-		$nodes = $folder->getDirectoryListing();
-
-		foreach ($nodes as $node) {
-			if ($node instanceof File) {
-				$this->processFile($node);
-			} else if ($node instanceof Folder) {
-				$this->processFolder($node);
-			}
-		}
 	}
 
 	private function calculateSizes() {
