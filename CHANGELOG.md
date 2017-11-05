@@ -1,3 +1,15 @@
+## 1.0.7 - 2017-09-26
+
+### Fixes
+- Updated/Fixed README
+  - [#55](https://github.com/rullzer/previewgenerator/pull/55) @Eeems
+  - [#58](https://github.com/rullzer/previewgenerator/pull/58) @MichaIng
+  - [#67](https://github.com/rullzer/previewgenerator/pull/67) @sndrr
+- Avoid folder processing on pre-generate [#73](https://github.com/rullzer/previewgenerator/pull/73) @Seik
+
+### Added
+- Make NC13 Compatible [#63](https://github.com/rullzer/previewgenerator/pull/63)
+
 ## 1.0.6 - 2017-05-05
 
 ### Fixed
