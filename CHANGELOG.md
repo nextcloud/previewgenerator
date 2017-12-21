@@ -1,3 +1,11 @@
+## 1.0.8 - 2017-12-21
+
+### Fixes
+- Do not add file if it already is in the table [#86](https://github.com/rullzer/previewgenerator/pull/86)
+
+### Added
+- Allow to specify sizes to be generated [#87](https://github.com/rullzer/previewgenerator/pull/86)
+
 ## 1.0.7 - 2017-09-26
 
 ### Fixes
