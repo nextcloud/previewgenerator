@@ -57,7 +57,25 @@ class Watcher {
 		$absPath = ltrim($node->getPath(), '/');
 		$owner = explode('/', $absPath)[0];
 
-		if (!$this->userManager->userExists($owner) || $node instanceof Folder) {
+		if ($node instanceof Folder || !$this->userManager->userExists($owner)) {
+			return;
+		}
+
+		$qb = $this->connection->getQueryBuilder();
+		$qb->select('id')
+			->from('preview_generation')
+			->where(
+				$qb->expr()->andX(
+					$qb->expr()->eq('uid', $qb->createNamedParameter($owner)),
+					$qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId()))
+				)
+			)->setMaxResults(1);
+		$cursor = $qb->execute();
+		$inTable = $cursor->fetch() !== false;
+		$cursor->closeCursor();
+
+		// Don't insert if there is already such an entry
+		if ($inTable) {
 			return;
 		}
 
