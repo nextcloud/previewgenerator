@@ -22,6 +22,7 @@
 	 */
 namespace OCA\PreviewGenerator\Command;
 
+use OCA\PreviewGenerator\SizeHelper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
@@ -132,7 +133,7 @@ class PreGenerate extends Command {
 		$this->updateLastActivity();
 		$this->output = $output;
 
-		$this->calculateSizes();
+		$this->sizes = SizeHelper::calculateSizes($this->config);
 		$this->startProcessing();
 
 		$this->clearLastActivity();
@@ -228,35 +229,6 @@ class PreGenerate extends Command {
 		}
 
 		$this->updateLastActivity();
-	}
-
-	private function calculateSizes() {
-		$this->sizes = [
-			'square' => [],
-			'height' => [],
-			'width' => [],
-		];
-
-		$maxW = (int)$this->config->getSystemValue('preview_max_x', 2048);
-		$maxH = (int)$this->config->getSystemValue('preview_max_y', 2048);
-
-		$s = 32;
-		while($s <= $maxW || $s <= $maxH) {
-			$this->sizes['square'][] = $s;
-			$s *= 2;
-		}
-
-		$w = 32;
-		while($w <= $maxW) {
-			$this->sizes['width'][] = $w;
-			$w *= 2;
-		}
-
-		$h = 32;
-		while($h <= $maxH) {
-			$this->sizes['height'][] = $h;
-			$h *= 2;
-		}
 	}
 
 	private function updateLastActivity() {

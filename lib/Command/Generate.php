@@ -23,6 +23,7 @@
 
 namespace OCA\PreviewGenerator\Command;
 
+use OCA\PreviewGenerator\SizeHelper;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
 use OCP\Files\Folder;
@@ -107,7 +108,7 @@ class Generate extends Command {
 		$this->output = $output;
 
 		$userId = $input->getArgument('user_id');
-		$this->calculateSizes();
+		$this->sizes = SizeHelper::calculateSizes($this->config);
 
 		if ($userId === null) {
 			$this->userManager->callForSeenUsers(function (IUser $user) {
@@ -121,35 +122,6 @@ class Generate extends Command {
 		}
 
 		return 0;
-	}
-
-	private function calculateSizes() {
-		$this->sizes = [
-			'square' => [],
-			'height' => [],
-			'width' => [],
-		];
-
-		$maxW = (int)$this->config->getSystemValue('preview_max_x', 2048);
-		$maxH = (int)$this->config->getSystemValue('preview_max_y', 2048);
-
-		$s = 32;
-		while ($s <= $maxW || $s <= $maxH) {
-			$this->sizes['square'][] = $s;
-			$s *= 2;
-		}
-
-		$w = 32;
-		while ($w <= $maxW) {
-			$this->sizes['width'][] = $w;
-			$w *= 2;
-		}
-
-		$h = 32;
-		while ($h <= $maxH) {
-			$this->sizes['height'][] = $h;
-			$h *= 2;
-		}
 	}
 
 	/**
