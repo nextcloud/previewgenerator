@@ -105,6 +105,9 @@ class Generate extends Command {
 			return 1;
 		}
 
+		// Set timestamp output
+		$formatter = new TimestampFormatter($this->config, $output->getFormatter());
+		$output->setFormatter($formatter);
 		$this->output = $output;
 
 		$userId = $input->getArgument('user_id');

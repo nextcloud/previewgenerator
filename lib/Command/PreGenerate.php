@@ -131,6 +131,10 @@ class PreGenerate extends Command {
 		}
 
 		$this->updateLastActivity();
+
+		// Set timestamp output
+		$formatter = new TimestampFormatter($this->config, $output->getFormatter());
+		$output->setFormatter($formatter);
 		$this->output = $output;
 
 		$this->sizes = SizeHelper::calculateSizes($this->config);
