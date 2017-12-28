@@ -4,6 +4,7 @@
 
 ### Added
 - Show timestamp in occ commands [#88](https://github.com/rullzer/previewgenerator/pull/88)
+- Add Composer Classmap for file (NC13) [#90](https://github.com/rullzer/previewgenerator/pull/90)
 
 ## 1.0.8 - 2017-12-21
 
