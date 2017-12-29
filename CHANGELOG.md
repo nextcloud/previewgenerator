@@ -6,6 +6,7 @@
 - Show timestamp in occ commands [#88](https://github.com/rullzer/previewgenerator/pull/88)
 - Add Composer Classmap for file (NC13) [#90](https://github.com/rullzer/previewgenerator/pull/90)
 - Respect .nomedia [#92](https://github.com/rullzer/previewgenerator/pull/92)
+- Use PID to check for already running process [#93](https://github.com/rullzer/previewgenerator/pull/93)
 
 ## 1.0.8 - 2017-12-21
 
