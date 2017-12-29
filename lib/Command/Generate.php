@@ -142,6 +142,12 @@ class Generate extends Command {
 	 * @param Folder $folder
 	 */
 	private function parseFolder(Folder $folder) {
+		// Respect the '.nomedia' file. If present don't traverse the folder
+		if ($folder->nodeExists('.nomedia')) {
+			$this->output->writeln('Skipping folder ' . $folder->getPath());
+			return;
+		}
+
 		$this->output->writeln('Scanning folder ' . $folder->getPath());
 
 		$nodes = $folder->getDirectoryListing();
