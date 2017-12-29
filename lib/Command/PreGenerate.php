@@ -102,12 +102,7 @@ class PreGenerate extends Command {
 	protected function configure() {
 		$this
 			->setName('preview:pre-generate')
-			->setDescription('Pre generate previews')
-			->addOption(
-				'force',
-				null,
-				InputOption::VALUE_NONE,
-				'Do not check for already running processes');
+			->setDescription('Pre generate previews');
 	}
 
 	/**
@@ -121,16 +116,12 @@ class PreGenerate extends Command {
 			return 1;
 		}
 
-		if (!$input->getOption('force')) {
-			$lastActivity = (int)$this->config->getAppValue($this->appName, 'lastActivity', 0);
-
-			if (($this->time->getTime() - $lastActivity) < 30 * 60) {
-				$output->writeln('Command is already running.');
-				return 2;
-			}
+		if ($this->checkAlreadyRunning()) {
+			$output->writeln('Command is already running.');
+			return 2;
 		}
 
-		$this->updateLastActivity();
+		$this->setPID();
 
 		// Set timestamp output
 		$formatter = new TimestampFormatter($this->config, $output->getFormatter());
@@ -140,14 +131,13 @@ class PreGenerate extends Command {
 		$this->sizes = SizeHelper::calculateSizes($this->config);
 		$this->startProcessing();
 
-		$this->clearLastActivity();
+		$this->clearPID();
 
 		return 0;
 	}
 
 	private function startProcessing() {
 		while(true) {
-
 			$qb = $this->connection->getQueryBuilder();
 			$qb->select('*')
 				->from('preview_generation')
@@ -231,15 +221,34 @@ class PreGenerate extends Command {
 				$this->output->writeln("<error>${error}</error>");
 			}
 		}
-
-		$this->updateLastActivity();
 	}
 
-	private function updateLastActivity() {
-		$this->config->setAppValue($this->appName, 'lastActivity', $this->time->getTime());
+	private function setPID() {
+		$this->config->setAppValue($this->appName, 'pid', posix_getpid());
 	}
 
-	private function clearLastActivity() {
-		$this->config->deleteAppValue($this->appName, 'lastActivity');
+	private function clearPID() {
+		$this->config->deleteAppValue($this->appName, 'pid');
+	}
+
+	private function getPID() {
+		return (int)$this->config->getAppValue($this->appName, 'pid', -1);
+	}
+
+	private function checkAlreadyRunning() {
+		$pid = $this->getPID();
+
+		// No PID set so just continue
+		if ($pid === -1) {
+			return false;
+		}
+
+		// Get get the gid of non running processes so continue
+		if (posix_getpgid($pid) === false) {
+			return false;
+		}
+
+		// Seems there is already a running process generating previews
+		return true;
 	}
 }
