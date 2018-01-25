@@ -80,7 +80,7 @@ This is possible since version 1.0.8. Just set the correct values via the comman
 ```
 
 This will only generate:
- * square previews ofL 32x32, 64x64 and 1024x1024
+ * square previews of: 32x32, 64x64 and 1024x1024
  * aspect ratio previews with a width of: 64, 128 and 1024
  * aspect ratio previews with a height of: 64, 256 and 1024
 
