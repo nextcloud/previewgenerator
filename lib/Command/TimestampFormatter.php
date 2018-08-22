@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
@@ -64,7 +65,7 @@ class TimestampFormatter implements OutputFormatterInterface {
 	 *
 	 * @return bool true if the output will decorate messages, false otherwise
 	 */
-	public function isDecorated() {
+	public function isDecorated(): bool {
 		return $this->formatter->isDecorated();
 	}
 
@@ -84,7 +85,7 @@ class TimestampFormatter implements OutputFormatterInterface {
 	 * @param string $name
 	 * @return bool
 	 */
-	public function hasStyle($name) {
+	public function hasStyle($name): bool {
 		return $this->formatter->hasStyle($name);
 	}
 
@@ -95,7 +96,7 @@ class TimestampFormatter implements OutputFormatterInterface {
 	 * @return OutputFormatterStyleInterface
 	 * @throws \InvalidArgumentException When style isn't defined
 	 */
-	public function getStyle($name) {
+	public function getStyle($name): OutputFormatterStyleInterface {
 		return $this->formatter->getStyle($name);
 	}
 
@@ -106,7 +107,7 @@ class TimestampFormatter implements OutputFormatterInterface {
 	 * @return string The styled message, prepended with a timestamp using the
 	 * log timezone and dateformat, e.g. "2015-06-23T17:24:37+02:00"
 	 */
-	public function format($message) {
+	public function format($message): string {
 
 		$timeZone = $this->config->getSystemValue('logtimezone', 'UTC');
 		$timeZone = $timeZone !== null ? new \DateTimeZone($timeZone) : null;
