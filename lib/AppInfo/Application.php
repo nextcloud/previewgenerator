@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -30,22 +31,15 @@ use OCP\Files\Node;
 
 class Application extends App {
 
-	/**
-	 * Application constructor.
-	 *
-	 * @param string $appName
-	 * @param array $urlParams
-	 */
-	public function __construct($appName, array $urlParams = []) {
-		parent::__construct($appName, $urlParams);
+	const APPNAME='previewgenerator';
+
+	public function __construct() {
+		parent::__construct(self::APPNAME);
 
 		$container = $this->getContainer();
 		$this->connectWatcher($container);
 	}
 
-	/**
-	 * @param IAppContainer $container
-	 */
 	private function connectWatcher(IAppContainer $container) {
 		/** @var IRootFolder $root */
 		$root = $container->query(IRootFolder::class);

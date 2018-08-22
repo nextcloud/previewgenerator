@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -35,24 +36,12 @@ class Watcher {
 	/** @var IUserManager */
 	private $userManager;
 
-	/**
-	 * Watcher constructor.
-	 *
-	 * @param IDBConnection $connection
-	 * @param IUserManager $userManager
-	 */
 	public function __construct(IDBConnection $connection,
 								IUserManager $userManager) {
 		$this->connection = $connection;
 		$this->userManager = $userManager;
 	}
 
-	/**
-	 * A node has been updated. We just store the file id
-	 * with the current user in the DB
-	 *
-	 * @param Node $node
-	 */
 	public function postWrite(Node $node) {
 		$absPath = ltrim($node->getPath(), '/');
 		$owner = explode('/', $absPath)[0];

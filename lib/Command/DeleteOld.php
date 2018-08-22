@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -40,10 +41,6 @@ class DeleteOld extends Command {
 	/** @var IRootFolder */
 	protected $rootFolder;
 
-	/**
-	 * @param IRootFolder $rootFolder
-	 * @param IUserManager $userManager
-	 */
 	public function __construct(IRootFolder $rootFolder,
 								IUserManager $userManager) {
 		parent::__construct();
@@ -63,12 +60,7 @@ class DeleteOld extends Command {
 			);
 	}
 
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 * @return int
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$userId = $input->getArgument('user_id');
 
 		if ($userId === null) {
@@ -85,9 +77,6 @@ class DeleteOld extends Command {
 		return 0;
 	}
 
-	/**
-	 * @param IUser $user
-	 */
 	private function deletePreviews(IUser $user) {
 		\OC_Util::tearDownFS();
 		\OC_Util::setupFS($user->getUID());

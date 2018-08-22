@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2017, Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -27,7 +28,7 @@ use OCP\IConfig;
 
 class SizeHelper {
 
-	public static function calculateSizes(IConfig $config) {
+	public static function calculateSizes(IConfig $config): array {
 		/*
 		 * First calculate the systems max sizes
 		 */
@@ -38,8 +39,8 @@ class SizeHelper {
 			'width' => [],
 		];
 
-		$maxW = (int)$config->getSystemValue('preview_max_x', 2048);
-		$maxH = (int)$config->getSystemValue('preview_max_y', 2048);
+		$maxW = (int)$config->getSystemValue('preview_max_x', 4096);
+		$maxH = (int)$config->getSystemValue('preview_max_y', 4096);
 
 		$s = 32;
 		while($s <= $maxW || $s <= $maxH) {
