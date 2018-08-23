@@ -37,6 +37,7 @@ use OCP\IUserManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command {
@@ -84,10 +85,10 @@ class Generate extends Command {
 				'user_id',
 				InputArgument::OPTIONAL,
 				'Generate previews for the given user'
-			->addOption(
+			)->addOption(
 				'path',
 				'p',
-				InputArgument::OPTIONAL,
+				InputOption::VALUE_OPTIONAL,
 				'limit scan to this path, eg. --path="/alice/files/Photos", the user_id is determined by the path and the user_id parameter is ignored'
 			);
 	}
@@ -138,6 +139,7 @@ class Generate extends Command {
 			$relativePath = $userFolder->getRelativePath($path);
 		} catch (NotFoundException $e) {
 			$this->output->writeln('Path not found');
+			return;
 		}
 		$pathFolder = $userFolder->get($relativePath);
 		$this->parseFolder($pathFolder);
