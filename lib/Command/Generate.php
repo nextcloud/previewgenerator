@@ -37,6 +37,7 @@ use OCP\IUserManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command {
@@ -84,6 +85,11 @@ class Generate extends Command {
 				'user_id',
 				InputArgument::OPTIONAL,
 				'Generate previews for the given user'
+			)->addOption(
+				'path',
+				'p',
+				InputOption::VALUE_OPTIONAL,
+				'limit scan to this path, eg. --path="/alice/files/Photos", the user_id is determined by the path and the user_id parameter is ignored'
 			);
 	}
 
@@ -98,21 +104,45 @@ class Generate extends Command {
 		$output->setFormatter($formatter);
 		$this->output = $output;
 
-		$userId = $input->getArgument('user_id');
 		$this->sizes = SizeHelper::calculateSizes($this->config);
 
-		if ($userId === null) {
-			$this->userManager->callForSeenUsers(function (IUser $user) {
-				$this->generateUserPreviews($user);
-			});
-		} else {
+		$inputPath = $input->getOption('path');
+		if ($inputPath) {
+			$inputPath = '/' . trim($inputPath, '/');
+			list (, $userId,) = explode('/', $inputPath, 3);
 			$user = $this->userManager->get($userId);
 			if ($user !== null) {
-				$this->generateUserPreviews($user);
+				$this->generatePathPreviews($user, $inputPath);
+			}
+		} else {
+			$userId = $input->getArgument('user_id');
+			if ($userId === null) {
+				$this->userManager->callForSeenUsers(function (IUser $user) {
+					$this->generateUserPreviews($user);
+				});
+			} else {
+				$user = $this->userManager->get($userId);
+				if ($user !== null) {
+					$this->generateUserPreviews($user);
+				}
 			}
 		}
 
 		return 0;
+	}
+
+	private function generatePathPreviews(IUser $user, string $path) {
+		\OC_Util::tearDownFS();
+		\OC_Util::setupFS($user->getUID());
+		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
+		try {
+			$relativePath = $userFolder->getRelativePath($path);
+		} catch (NotFoundException $e) {
+			$this->output->writeln('Path not found');
+			return;
+		}
+		$pathFolder = $userFolder->get($relativePath);
+		$this->parseFolder($pathFolder);
 	}
 
 	private function generateUserPreviews(IUser $user) {
