@@ -1,3 +1,10 @@
+## 2.0.0 - TBD
+
+- PHP 7.x required
+- Nextcloud 14 only
+- Moved to migrations for DB handling
+- Added path option to generate command (thanks to @adduxa)
+
 ## 1.0.9 - 2017-12-29
 
 ### Fixes
