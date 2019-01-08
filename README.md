@@ -18,7 +18,8 @@ requested before it is pre-generated it will still be shown.
 
 1. Install the app
 2. Enable the app
-3. Add a (system) cron job for ` ./occ preview:pre-generate`
+3. Run `./occ preview:generate-all` once after installation.
+4. Add a (system) cron job for ` ./occ preview:pre-generate`
   * I run it every 10 minutes
 
 ## Known issues
