@@ -1,3 +1,7 @@
+## 2.1.0 - 2019-03-05
+### Added
+- Nextcloud 16 support
+
 ## 2.0.0 - 2018-11-08
 
 - PHP 7.x required
