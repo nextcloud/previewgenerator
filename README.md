@@ -48,6 +48,11 @@ Nextcloud 11. That has some issues. Note that the gallery shipped with Nextcloud
 Loop over all files and try to generate previews for them. If `user-id` is supplied
 just loop over the files for that user.
 
+### preview:generate-all --path="[path from nextcloud/data directory]"
+
+Loop over all files in the given directory and try to generate previews for them. The user_id is determined by the path and the user_id parameter is ignored if supplied.
+Example: `occ preview:generate-all --path="/[username]/files/[folder path]"`
+
 ### preview:pre-generate
 
 Do the actual pregeneration. This means only for new or modified files (since
