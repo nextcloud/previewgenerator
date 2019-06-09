@@ -27,6 +27,7 @@ class ComposerStaticInitPreviewGenerator
         'OCA\\PreviewGenerator\\Command\\PreGenerate' => __DIR__ . '/..' . '/../lib/Command/PreGenerate.php',
         'OCA\\PreviewGenerator\\Command\\TimestampFormatter' => __DIR__ . '/..' . '/../lib/Command/TimestampFormatter.php',
         'OCA\\PreviewGenerator\\Migration\\Version020000Date20180823071939' => __DIR__ . '/..' . '/../lib/Migration/Version020000Date20180823071939.php',
+        'OCA\\PreviewGenerator\\Migration\\Version020200Date20190608205303' => __DIR__ . '/..' . '/../lib/Migration/Version020200Date20190608205303.php',
         'OCA\\PreviewGenerator\\SizeHelper' => __DIR__ . '/..' . '/../lib/SizeHelper.php',
         'OCA\\PreviewGenerator\\Watcher' => __DIR__ . '/..' . '/../lib/Watcher.php',
     );

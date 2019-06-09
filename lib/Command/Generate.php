@@ -31,6 +31,7 @@ use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IConfig;
+use OCP\IDBConnection;
 use OCP\IPreview;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -54,6 +55,9 @@ class Generate extends Command {
 	/** @var IConfig */
 	protected $config;
 
+	/** @var IDBConnection */
+	protected $connection;
+
 	/** @var OutputInterface */
 	protected $output;
 
@@ -67,6 +71,7 @@ class Generate extends Command {
 								IUserManager $userManager,
 								IPreview $previewGenerator,
 								IConfig $config,
+								IDBConnection $connection,
 								IManager $encryptionManager) {
 		parent::__construct();
 
@@ -74,6 +79,7 @@ class Generate extends Command {
 		$this->rootFolder = $rootFolder;
 		$this->previewGenerator = $previewGenerator;
 		$this->config = $config;
+		$this->connection = $connection;
 		$this->encryptionManager = $encryptionManager;
 	}
 
@@ -142,7 +148,7 @@ class Generate extends Command {
 			return;
 		}
 		$pathFolder = $userFolder->get($relativePath);
-		$this->parseFolder($pathFolder);
+		$this->processFolder($pathFolder, $user);
 	}
 
 	private function generateUserPreviews(IUser $user) {
@@ -150,15 +156,18 @@ class Generate extends Command {
 		\OC_Util::setupFS($user->getUID());
 
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
-		$this->parseFolder($userFolder);
+		$this->processFolder($userFolder, $user);
 	}
 
-	private function parseFolder(Folder $folder) {
+	private function processFolder(Folder $folder, IUser $user) {
 		// Respect the '.nomedia' file. If present don't traverse the folder
 		if ($folder->nodeExists('.nomedia')) {
 			$this->output->writeln('Skipping folder ' . $folder->getPath());
 			return;
 		}
+
+		// random sleep between 0 and 50ms to avoid collision between 2 processes
+		usleep(rand(0,50000));
 
 		$this->output->writeln('Scanning folder ' . $folder->getPath());
 
@@ -166,14 +175,50 @@ class Generate extends Command {
 
 		foreach ($nodes as $node) {
 			if ($node instanceof Folder) {
-				$this->parseFolder($node);
+				$this->processFolder($node, $user);
 			} else if ($node instanceof File) {
-				$this->parseFile($node);
+				$is_locked = false;
+				$qb = $this->connection->getQueryBuilder();
+				$row = $qb->select('*')
+                                  ->from('preview_generation')
+                                  ->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
+                                  ->setMaxResults(1)
+                                  ->execute()
+                                  ->fetch();
+				if ($row !== false) {
+					if ($row['locked'] == 1) {
+						// already being processed
+						$is_locked = true;
+					} else {
+						$qb->update('preview_generation')
+						   ->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
+						   ->set('locked', $qb->createNamedParameter(true))
+						   ->execute();
+					}
+				} else {
+					$qb->insert('preview_generation')
+				           ->values([
+					       'uid'     => $qb->createNamedParameter($user->getUID()),
+					       'file_id' => $qb->createNamedParameter($node->getId()),
+					       'locked'  => $qb->createNamedParameter(true),
+				           ])
+					   ->execute();
+				}
+
+				if ($is_locked === false) {
+					try {
+						$this->processFile($node);
+					} finally {
+						$qb->delete('preview_generation')
+	 					    ->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
+						    ->execute();
+					}
+				}
 			}
 		}
 	}
 
-	private function parseFile(File $file) {
+	private function processFile(File $file) {
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
 			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
 				$this->output->writeln('Generating previews for ' . $file->getPath());

@@ -12,6 +12,7 @@ return array(
     'OCA\\PreviewGenerator\\Command\\PreGenerate' => $baseDir . '/../lib/Command/PreGenerate.php',
     'OCA\\PreviewGenerator\\Command\\TimestampFormatter' => $baseDir . '/../lib/Command/TimestampFormatter.php',
     'OCA\\PreviewGenerator\\Migration\\Version020000Date20180823071939' => $baseDir . '/../lib/Migration/Version020000Date20180823071939.php',
+    'OCA\\PreviewGenerator\\Migration\\Version020200Date20190608205303' => $baseDir . '/../lib/Migration/Version020200Date20190608205303.php',
     'OCA\\PreviewGenerator\\SizeHelper' => $baseDir . '/../lib/SizeHelper.php',
     'OCA\\PreviewGenerator\\Watcher' => $baseDir . '/../lib/Watcher.php',
 );
