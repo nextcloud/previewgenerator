@@ -200,18 +200,33 @@ class PreGenerate extends Command {
 			}
 
 			try {
-				foreach ($this->sizes['square'] as $size) {
-					$this->previewGenerator->getPreview($file, $size, $size, true);
-				}
+				if (method_exists(IPreview::class, 'generatePreviews')) {
+					$specifications = array_merge(
+						array_map(function ($squareSize) {
+							return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
+						}, $this->sizes['square']),
+						array_map(function ($heightSize) {
+							return ['width' => -1, 'height' => $heightSize, 'crop' => false];
+						}, $this->sizes['height']),
+						array_map(function ($widthSize) {
+							return ['width' => $widthSize, 'height' => -1, 'crop' => false];
+						}, $this->sizes['width'])
+					);
+					$this->previewGenerator->generatePreviews($file, $specifications);
+				} else {
+					foreach ($this->sizes['square'] as $size) {
+						$this->previewGenerator->getPreview($file, $size, $size, true);
+					}
 
-				// Height previews
-				foreach ($this->sizes['height'] as $height) {
-					$this->previewGenerator->getPreview($file, -1, $height, false);
-				}
+					// Height previews
+					foreach ($this->sizes['height'] as $height) {
+						$this->previewGenerator->getPreview($file, -1, $height, false);
+					}
 
-				// Width previews
-				foreach ($this->sizes['width'] as $width) {
-					$this->previewGenerator->getPreview($file, $width, -1, false);
+					// Width previews
+					foreach ($this->sizes['width'] as $width) {
+						$this->previewGenerator->getPreview($file, $width, -1, false);
+					}
 				}
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
