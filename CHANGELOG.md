@@ -1,3 +1,7 @@
+## 2.3.0 - 2020-04-03
+### Added
+- Nextcloud 19 support
+
 ## 2.2.0 - 2019-12-05
 ### Added
 - Nextcloud 18 support
