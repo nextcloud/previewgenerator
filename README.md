@@ -43,9 +43,9 @@ This removes the previews from the old preview location that was used before
 Nextcloud 11. That has some issues. Note that the gallery shipped with Nextcloud
 11 did not yet use this location. So you might want to run it again with Nextcloud 12.
 
-### preview:generate-all [user-id]
+### preview:generate-all [user-name]
 
-Loop over all files and try to generate previews for them. If `user-id` is supplied
+Loop over all files and try to generate previews for them. If `user-name` is supplied
 just loop over the files for that user.
 
 ### preview:pre-generate
