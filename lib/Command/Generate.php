@@ -36,6 +36,7 @@ use OCP\IConfig;
 use OCP\IPreview;
 use OCP\IUser;
 use OCP\IUserManager;
+use OCA\Files_External\Service\GlobalStoragesService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -43,6 +44,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command {
+	
+	/** @var GlobalStoragesService */
+	protected $globalService;
 
 	/** @var IUserManager */
 	protected $userManager;
@@ -65,13 +69,15 @@ class Generate extends Command {
 	/** @var IManager */
 	protected $encryptionManager;
 
-	public function __construct(IRootFolder $rootFolder,
+	public function __construct(GlobalStoragesService $globalService,
+								IRootFolder $rootFolder,
 								IUserManager $userManager,
 								IPreview $previewGenerator,
 								IConfig $config,
 								IManager $encryptionManager) {
 		parent::__construct();
 
+		$this->globalService = $globalService;
 		$this->userManager = $userManager;
 		$this->rootFolder = $rootFolder;
 		$this->previewGenerator = $previewGenerator;
@@ -133,6 +139,21 @@ class Generate extends Command {
 		return 0;
 	}
 
+	private function getNoPreviewMountPaths(IUser $user) {
+		$mountPaths = [];
+		$userId = $user->getUID();
+		$mounts = $this->globalService->getStorageForAllUsers();
+		foreach ($mounts as $mount) {
+			if (in_array($userId, $mount->getApplicableUsers()) &&
+				$mount->getMountOptions()['previews'] === false
+			) {
+				$rootFolder = $this->rootFolder->getUserFolder($userId)->getPath();
+				array_push($mountPaths, $rootFolder.$mount->getMountPoint());
+			}
+		}
+		return $mountPaths;
+	}
+
 	private function generatePathPreviews(IUser $user, string $path) {
 		\OC_Util::tearDownFS();
 		\OC_Util::setupFS($user->getUID());
@@ -144,7 +165,8 @@ class Generate extends Command {
 			return;
 		}
 		$pathFolder = $userFolder->get($relativePath);
-		$this->parseFolder($pathFolder);
+		$noPreviewMountPaths = $this->getNoPreviewMountPaths($user);
+		$this->parseFolder($pathFolder, $noPreviewMountPaths);
 	}
 
 	private function generateUserPreviews(IUser $user) {
@@ -152,18 +174,22 @@ class Generate extends Command {
 		\OC_Util::setupFS($user->getUID());
 
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
-		$this->parseFolder($userFolder);
+		$noPreviewMountPaths = $this->getNoPreviewMountPaths($user);
+		$this->parseFolder($userFolder, $noPreviewMountPaths);
 	}
 
-	private function parseFolder(Folder $folder) {
+	private function parseFolder(Folder $folder, $noPreviewMountPaths) {
 		try {
+			$folderPath = $folder->getPath();
+
 			// Respect the '.nomedia' file. If present don't traverse the folder
-			if ($folder->nodeExists('.nomedia')) {
-				$this->output->writeln('Skipping folder ' . $folder->getPath());
+			// Same for external mounts with previews disabled
+			if ($folder->nodeExists('.nomedia') || in_array($folderPath, $noPreviewMountPaths)) {
+				$this->output->writeln('Skipping folder ' . $folderPath);
 				return;
 			}
 
-			$this->output->writeln('Scanning folder ' . $folder->getPath());
+			$this->output->writeln('Scanning folder ' . $folderPath);
 
 			$nodes = $folder->getDirectoryListing();
 
