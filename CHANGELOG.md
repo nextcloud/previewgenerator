@@ -1,3 +1,12 @@
+## 3.0.0 - 2020-08-31
+### Added
+- Nextcloud 20 support
+- IBootstap support
+- Listen to new events hence only initialize the FS if needed
+
+### Removed
+- Nextcloud <20 support
+
 ## 2.3.0 - 2020-04-03
 ### Added
 - Nextcloud 19 support

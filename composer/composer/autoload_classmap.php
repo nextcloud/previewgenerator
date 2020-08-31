@@ -11,7 +11,7 @@ return array(
     'OCA\\PreviewGenerator\\Command\\Generate' => $baseDir . '/../lib/Command/Generate.php',
     'OCA\\PreviewGenerator\\Command\\PreGenerate' => $baseDir . '/../lib/Command/PreGenerate.php',
     'OCA\\PreviewGenerator\\Command\\TimestampFormatter' => $baseDir . '/../lib/Command/TimestampFormatter.php',
+    'OCA\\PreviewGenerator\\Listeners\\PostWriteListener' => $baseDir . '/../lib/Listeners/PostWriteListener.php',
     'OCA\\PreviewGenerator\\Migration\\Version020000Date20180823071939' => $baseDir . '/../lib/Migration/Version020000Date20180823071939.php',
     'OCA\\PreviewGenerator\\SizeHelper' => $baseDir . '/../lib/SizeHelper.php',
-    'OCA\\PreviewGenerator\\Watcher' => $baseDir . '/../lib/Watcher.php',
 );
