@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
@@ -109,7 +110,7 @@ class Generate extends Command {
 		$inputPath = $input->getOption('path');
 		if ($inputPath) {
 			$inputPath = '/' . trim($inputPath, '/');
-			list (, $userId,) = explode('/', $inputPath, 3);
+			list(, $userId,) = explode('/', $inputPath, 3);
 			$user = $this->userManager->get($userId);
 			if ($user !== null) {
 				$this->generatePathPreviews($user, $inputPath);
@@ -167,7 +168,7 @@ class Generate extends Command {
 		foreach ($nodes as $node) {
 			if ($node instanceof Folder) {
 				$this->parseFolder($node);
-			} else if ($node instanceof File) {
+			} elseif ($node instanceof File) {
 				$this->parseFile($node);
 			}
 		}
@@ -201,5 +202,4 @@ class Generate extends Command {
 			}
 		}
 	}
-
 }
