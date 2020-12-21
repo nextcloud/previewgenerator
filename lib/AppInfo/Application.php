@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
@@ -31,8 +32,7 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\Files\Events\Node\NodeWrittenEvent;
 
 class Application extends App implements IBootstrap {
-
-	const APPNAME='previewgenerator';
+	public const APPNAME='previewgenerator';
 
 	public function __construct() {
 		parent::__construct(self::APPNAME);
@@ -43,6 +43,5 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function boot(IBootContext $context): void {
-
 	}
 }
