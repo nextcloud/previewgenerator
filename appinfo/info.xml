@@ -13,7 +13,7 @@ The first time you install this app, before using a cron job, you properly want 
 	</description>
 	<licence>AGPL</licence>
 	<author>Roeland Jago Douma</author>
-	<version>3.0.1</version>
+	<version>3.1.0</version>
 	<namespace>PreviewGenerator</namespace>
 	<category>multimedia</category>
 	<website>https://github.com/rullzer/previewgenerator</website>
@@ -24,7 +24,7 @@ The first time you install this app, before using a cron job, you properly want 
 	</types>
 	<dependencies>
 		<php min-version="7.2"/>
-		<nextcloud min-version="20" max-version="20" />
+		<nextcloud min-version="20" max-version="21" />
 	</dependencies>
 
 	<commands>
