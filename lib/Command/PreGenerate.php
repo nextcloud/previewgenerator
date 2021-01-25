@@ -173,8 +173,8 @@ class PreGenerate extends Command {
 			return;
 		}
 
-                \OC_Util::tearDownFS();
-                \OC_Util::setupFS($row['uid']);
+		\OC_Util::tearDownFS();
+		\OC_Util::setupFS($row['uid']);
 
 		try {
 			$userFolder = $this->rootFolder->getUserFolder($user->getUID());
