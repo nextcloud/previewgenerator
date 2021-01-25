@@ -6,14 +6,14 @@
 	<description><![CDATA[The Preview Generator app allows admins to pre-generate previews. The app listens to edit events and stores this information. Once a cron job is triggered it will generate start preview generation. This means that you can better utilize your system by pre-generating previews when your system is normally idle and thus putting less load on your machine when the requests are actually served.
 
 The app does not replace on demand preview generation so if a preview is requested before it is pre-generated it will still be shown.
-The first time you install this app, before using a cron job, you properly want to generate all previews via: 
+The first time you install this app, before using a cron job, you properly want to generate all previews via:
 **./occ preview:generate-all -vvv**
 
 **Important**: To enable pre-generation of previews you must add **php /var/www/nextcloud/occ preview:pre-generate** to a system cron job that runs at times of your choosing.]]>
 	</description>
 	<licence>AGPL</licence>
 	<author>Roeland Jago Douma</author>
-	<version>2.3.0</version>
+	<version>3.1.0</version>
 	<namespace>PreviewGenerator</namespace>
 	<category>multimedia</category>
 	<website>https://github.com/rullzer/previewgenerator</website>
@@ -23,8 +23,8 @@ The first time you install this app, before using a cron job, you properly want 
 		<filesystem/>
 	</types>
 	<dependencies>
-		<php min-version="7.0"/>
-		<nextcloud min-version="14" max-version="19" />
+		<php min-version="7.2"/>
+		<nextcloud min-version="20" max-version="21" />
 	</dependencies>
 
 	<commands>

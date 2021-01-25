@@ -34,7 +34,6 @@ use OCP\IPreview;
 use OCP\IUserManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PreGenerate extends Command {
@@ -137,7 +136,7 @@ class PreGenerate extends Command {
 	}
 
 	private function startProcessing() {
-		while(true) {
+		while (true) {
 			$qb = $this->connection->getQueryBuilder();
 			$qb->select('*')
 				->from('preview_generation')
