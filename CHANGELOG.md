@@ -1,3 +1,11 @@
+## 3.1.1 - 2021-01-27
+### Changed
+- Use new batch preview method
+
+### Fixed
+- Init filesystem for the users
+- Handle unavailable storages more graceful
+
 ## 3.1.0 -2020-12-21
 ### Added
 - Nextcloud 21 support
