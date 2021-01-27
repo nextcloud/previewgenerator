@@ -31,6 +31,7 @@ use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\Files\StorageNotAvailableException;
 use OCP\IConfig;
 use OCP\IPreview;
 use OCP\IUser;
@@ -155,22 +156,29 @@ class Generate extends Command {
 	}
 
 	private function parseFolder(Folder $folder) {
-		// Respect the '.nomedia' file. If present don't traverse the folder
-		if ($folder->nodeExists('.nomedia')) {
-			$this->output->writeln('Skipping folder ' . $folder->getPath());
-			return;
-		}
-
-		$this->output->writeln('Scanning folder ' . $folder->getPath());
-
-		$nodes = $folder->getDirectoryListing();
-
-		foreach ($nodes as $node) {
-			if ($node instanceof Folder) {
-				$this->parseFolder($node);
-			} elseif ($node instanceof File) {
-				$this->parseFile($node);
+		try {
+			// Respect the '.nomedia' file. If present don't traverse the folder
+			if ($folder->nodeExists('.nomedia')) {
+				$this->output->writeln('Skipping folder ' . $folder->getPath());
+				return;
 			}
+
+			$this->output->writeln('Scanning folder ' . $folder->getPath());
+
+			$nodes = $folder->getDirectoryListing();
+
+			foreach ($nodes as $node) {
+				if ($node instanceof Folder) {
+					$this->parseFolder($node);
+				} elseif ($node instanceof File) {
+					$this->parseFile($node);
+				}
+			}
+		} catch (StorageNotAvailableException $e) {
+			$this->output->writeln(sprintf('<error>Storage for folder folder %s is not available: %s</error>',
+				$folder->getPath(),
+				$e->getHint()
+			));
 		}
 	}
 
