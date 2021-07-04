@@ -1,3 +1,7 @@
+## 3.1.2 -2021-06-30
+### Added
+- Added returning only rendered previews (configuring by setting 'enable_generated_previews_only': bool)
+
 ## 3.1.1 - 2021-01-27
 ### Changed
 - Use new batch preview method

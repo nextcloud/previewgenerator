@@ -1,5 +1,12 @@
 # Preview Generator
 
+# CUSTOM CHANGES
+It is previewgenerator app with some additions: IT IS CHANGE preview behaviour.
+If there is no rendered preview, it is not trigger default preview system to generate it: just return 404 NOT_FOUND.
+If there is rendered preview, it is not change default behaviour and allows to return and render preview.
+Motivation: In case of upload so many pictures you could to view pictures which haven't generated previews. In this case nextcloud try to generate all of these and use all of system memory.
+To enable/disable feature, set enable_generated_previews_only : bool parameter in sesttings to true(default)/false.
+
 Nextcloud app that allows admins to pre-generate previews. The app listens to 
 edit events and stores this information. Once a cron job is triggered it will
 start preview generation. This means that you can better utilize your

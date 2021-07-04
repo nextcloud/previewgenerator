@@ -24,7 +24,9 @@ declare(strict_types=1);
  */
 namespace OCA\PreviewGenerator\AppInfo;
 
+use OC\AppFramework\Middleware\MiddlewareDispatcher;
 use OCA\PreviewGenerator\Listeners\PostWriteListener;
+use OCA\PreviewGenerator\Middleware\PreviewMiddleware;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -36,6 +38,10 @@ class Application extends App implements IBootstrap {
 
 	public function __construct() {
 		parent::__construct(self::APPNAME);
+
+		// Register middleware with deprecated method because modern method not working
+        $this->registerImagePreviewMiddleware();
+
 	}
 
 	public function register(IRegistrationContext $context): void {
@@ -44,4 +50,12 @@ class Application extends App implements IBootstrap {
 
 	public function boot(IBootContext $context): void {
 	}
+
+	private function registerImagePreviewMiddleware() : void {
+        $container = \OC::$server->query(\OC\Core\Application::class)->getContainer();
+        $container->registerService(PreviewMiddleware::class, function($c){
+            return new PreviewMiddleware($c->query('ServerContainer')->getDatabaseConnection());
+        });
+        $container->registerMiddleware(PreviewMiddleware::class);
+    }
 }
