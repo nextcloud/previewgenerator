@@ -1,3 +1,7 @@
+## 3.1.2 - 2021-10-08
+### Changed
+- Nextcloud 22 support
+
 ## 3.1.1 - 2021-01-27
 ### Changed
 - Use new batch preview method
