@@ -13,12 +13,13 @@ The first time you install this app, before using a cron job, you properly want 
 	</description>
 	<licence>AGPL</licence>
 	<author>Roeland Jago Douma</author>
-	<version>3.1.1</version>
+	<author>Richard Steinmetz</author>
+	<version>3.2.0</version>
 	<namespace>PreviewGenerator</namespace>
 	<category>multimedia</category>
-	<website>https://github.com/rullzer/previewgenerator</website>
-	<bugs>https://github.com/rullzer/previewgenerator/issues</bugs>
-	<repository type="git">https://github.com/rullzer/previewgenerator.git</repository>
+	<website>https://github.com/nextcloud/previewgenerator</website>
+	<bugs>https://github.com/nextcloud/previewgenerator/issues</bugs>
+	<repository type="git">https://github.com/nextcloud/previewgenerator.git</repository>
 	<types>
 		<filesystem/>
 	</types>
