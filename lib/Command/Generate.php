@@ -90,8 +90,8 @@ class Generate extends Command {
 			)->addOption(
 				'path',
 				'p',
-				InputOption::VALUE_OPTIONAL,
-				'limit scan to this path, eg. --path="/alice/files/Photos", the user_id is determined by the path and all user_id arguments are ignored'
+				InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+				'limit scan to this path, eg. --path="/alice/files/Photos", the user_id is determined by the path and all user_id arguments are ignored, multiple usages allowed'
 			);
 	}
 
@@ -108,13 +108,15 @@ class Generate extends Command {
 
 		$this->sizes = SizeHelper::calculateSizes($this->config);
 
-		$inputPath = $input->getOption('path');
-		if ($inputPath) {
-			$inputPath = '/' . trim($inputPath, '/');
-			[, $userId,] = explode('/', $inputPath, 3);
-			$user = $this->userManager->get($userId);
-			if ($user !== null) {
-				$this->generatePathPreviews($user, $inputPath);
+		$inputPaths = $input->getOption('path');
+		if ($inputPaths) {
+			foreach ($inputPaths as $inputPath) {
+				$inputPath = '/' . trim($inputPath, '/');
+				[, $userId,] = explode('/', $inputPath, 3);
+				$user = $this->userManager->get($userId);
+				if ($user !== null) {
+					$this->generatePathPreviews($user, $inputPath);
+				}
 			}
 		} else {
 			$userIds = $input->getArgument('user_id');
