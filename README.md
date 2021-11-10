@@ -94,3 +94,7 @@ Note:
  You need to increase the memory allowance of PHP, by default it is 128 MB. You do that by changing the memory_limit in the php.ini file.
  
  If you use the docker container you need to create the php.ini file in /usr/local/etc/php first.
+
+### I want to skip a folder and everything in/under it
+
+Add an empty file with the name `.nomedia` in the folder you wish to skip. All files and subfolders of the folder containing `.nomedia` will also be skipped.
