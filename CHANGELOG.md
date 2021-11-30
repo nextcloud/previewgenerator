@@ -1,3 +1,7 @@
+## 3.3.0 - 2021-11-30
+### Added
+- Nextcloud 23 support
+
 ## 3.2.0 - 2021-11-09
 ### Added
 - Nextcloud 22 support
