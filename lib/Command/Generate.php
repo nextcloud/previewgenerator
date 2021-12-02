@@ -120,12 +120,12 @@ class Generate extends Command {
 			}
 		} else {
 			$userIds = $input->getArgument('user_id');
-			if (count($userId) === 0) {
+			if (count($userIds) === 0) {
 				$this->userManager->callForSeenUsers(function (IUser $user) {
 					$this->generateUserPreviews($user);
 				});
 			} else {
-				for ($userIds as $userId) {
+				foreach ($userIds as $userId) {
 					$user = $this->userManager->get($userId);
 					if ($user !== null) {
 						$this->generateUserPreviews($user);

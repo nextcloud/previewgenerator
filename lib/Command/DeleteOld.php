@@ -64,7 +64,7 @@ class DeleteOld extends Command {
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$userIds = $input->getArgument('user_id');
 
-		if (count($userId) === 0) {
+		if (count($userIds) === 0) {
 			$this->userManager->callForSeenUsers(function (IUser $user) {
 				$this->deletePreviews($user);
 			});
