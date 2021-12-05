@@ -69,20 +69,20 @@ class Generate extends Command {
 	/** @var IManager */
 	protected $encryptionManager;
 
-	public function __construct(GlobalStoragesService $globalService,
-								IRootFolder $rootFolder,
+	public function __construct(IRootFolder $rootFolder,
 								IUserManager $userManager,
 								IPreview $previewGenerator,
 								IConfig $config,
-								IManager $encryptionManager) {
+								IManager $encryptionManager,
+								GlobalStoragesService $globalService = null) {
 		parent::__construct();
 
-		$this->globalService = $globalService;
 		$this->userManager = $userManager;
 		$this->rootFolder = $rootFolder;
 		$this->previewGenerator = $previewGenerator;
 		$this->config = $config;
 		$this->encryptionManager = $encryptionManager;
+		$this->globalService = $globalService;
 	}
 
 	protected function configure() {
@@ -140,6 +140,9 @@ class Generate extends Command {
 	}
 
 	private function getNoPreviewMountPaths(IUser $user) {
+		if ($this->globalService === null) {
+			return [];
+		}
 		$mountPaths = [];
 		$userId = $user->getUID();
 		$mounts = $this->globalService->getStorageForAllUsers();
@@ -147,8 +150,8 @@ class Generate extends Command {
 			if (in_array($userId, $mount->getApplicableUsers()) &&
 				$mount->getMountOptions()['previews'] === false
 			) {
-				$rootFolder = $this->rootFolder->getUserFolder($userId)->getPath();
-				array_push($mountPaths, $rootFolder.$mount->getMountPoint());
+				$userFolder = $this->rootFolder->getUserFolder($userId)->getPath();
+				array_push($mountPaths, $userFolder.$mount->getMountPoint());
 			}
 		}
 		return $mountPaths;
@@ -195,7 +198,7 @@ class Generate extends Command {
 
 			foreach ($nodes as $node) {
 				if ($node instanceof Folder) {
-					$this->parseFolder($node);
+					$this->parseFolder($node, $noPreviewMountPaths);
 				} elseif ($node instanceof File) {
 					$this->parseFile($node);
 				}
