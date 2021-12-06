@@ -45,7 +45,7 @@ class WatcherTest extends TestCase {
 	/** @var Watcher */
 	private $watcher;
 
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 
 		$this->connection = \OC::$server->getDatabaseConnection();
