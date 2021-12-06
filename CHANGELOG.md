@@ -1,3 +1,8 @@
+## 3.4.0 - 2021-12-06
+### Added
+- Skip external mounts with disabled previews (thanks to @hashworks)
+- Allow multiple paths and user ids (thanks to @hammer065)
+
 ## 3.3.0 - 2021-11-30
 ### Added
 - Nextcloud 23 support
