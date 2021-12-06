@@ -91,13 +91,13 @@ class Generate extends Command {
 			->setDescription('Generate previews')
 			->addArgument(
 				'user_id',
-				InputArgument::OPTIONAL,
-				'Generate previews for the given user'
+				InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+				'Generate previews for the given user(s)'
 			)->addOption(
 				'path',
 				'p',
-				InputOption::VALUE_OPTIONAL,
-				'limit scan to this path, eg. --path="/alice/files/Photos", the user_id is determined by the path and the user_id parameter is ignored'
+				InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+				'limit scan to this path, eg. --path="/alice/files/Photos", the user_id is determined by the path and all user_id arguments are ignored, multiple usages allowed'
 			);
 	}
 
@@ -114,24 +114,28 @@ class Generate extends Command {
 
 		$this->sizes = SizeHelper::calculateSizes($this->config);
 
-		$inputPath = $input->getOption('path');
-		if ($inputPath) {
-			$inputPath = '/' . trim($inputPath, '/');
-			[, $userId,] = explode('/', $inputPath, 3);
-			$user = $this->userManager->get($userId);
-			if ($user !== null) {
-				$this->generatePathPreviews($user, $inputPath);
+		$inputPaths = $input->getOption('path');
+		if ($inputPaths) {
+			foreach ($inputPaths as $inputPath) {
+				$inputPath = '/' . trim($inputPath, '/');
+				[, $userId,] = explode('/', $inputPath, 3);
+				$user = $this->userManager->get($userId);
+				if ($user !== null) {
+					$this->generatePathPreviews($user, $inputPath);
+				}
 			}
 		} else {
-			$userId = $input->getArgument('user_id');
-			if ($userId === null) {
+			$userIds = $input->getArgument('user_id');
+			if (count($userIds) === 0) {
 				$this->userManager->callForSeenUsers(function (IUser $user) {
 					$this->generateUserPreviews($user);
 				});
 			} else {
-				$user = $this->userManager->get($userId);
-				if ($user !== null) {
-					$this->generateUserPreviews($user);
+				foreach ($userIds as $userId) {
+					$user = $this->userManager->get($userId);
+					if ($user !== null) {
+						$this->generateUserPreviews($user);
+					}
 				}
 			}
 		}

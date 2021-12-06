@@ -56,22 +56,24 @@ class DeleteOld extends Command {
 			->setDescription('Delete old preview folder (pre NC11)')
 			->addArgument(
 				'user_id',
-				InputArgument::OPTIONAL,
-				'Delete old preview folder for the given user'
+				InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+				'Delete old preview folder for the given user(s)'
 			);
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$userId = $input->getArgument('user_id');
+		$userIds = $input->getArgument('user_id');
 
-		if ($userId === null) {
+		if (count($userIds) === 0) {
 			$this->userManager->callForSeenUsers(function (IUser $user) {
 				$this->deletePreviews($user);
 			});
 		} else {
-			$user = $this->userManager->get($userId);
-			if ($user !== null) {
-				$this->deletePreviews($user);
+			foreach ($userIds as $userId) {
+				$user = $this->userManager->get($userId);
+				if ($user !== null) {
+					$this->deletePreviews($user);
+				}
 			}
 		}
 
