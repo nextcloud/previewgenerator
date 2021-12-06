@@ -44,8 +44,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command {
-	
-	/** @var GlobalStoragesService */
+
+	/** @var ?GlobalStoragesService */
 	protected $globalService;
 
 	/** @var IUserManager */
@@ -74,7 +74,7 @@ class Generate extends Command {
 								IPreview $previewGenerator,
 								IConfig $config,
 								IManager $encryptionManager,
-								GlobalStoragesService $globalService = null) {
+								?GlobalStoragesService $globalService = null) {
 		parent::__construct();
 
 		$this->userManager = $userManager;
@@ -139,7 +139,7 @@ class Generate extends Command {
 		return 0;
 	}
 
-	private function getNoPreviewMountPaths(IUser $user) {
+	private function getNoPreviewMountPaths(IUser $user): array {
 		if ($this->globalService === null) {
 			return [];
 		}
@@ -181,7 +181,7 @@ class Generate extends Command {
 		$this->parseFolder($userFolder, $noPreviewMountPaths);
 	}
 
-	private function parseFolder(Folder $folder, $noPreviewMountPaths) {
+	private function parseFolder(Folder $folder, array $noPreviewMountPaths): void {
 		try {
 			$folderPath = $folder->getPath();
 
