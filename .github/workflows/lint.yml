@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - main
       - stable*
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         php-versions: ['7.3', '7.4', '8.0']
-  
+
     name: php${{ matrix.php-versions }}
     steps:
       - uses: actions/checkout@v2
