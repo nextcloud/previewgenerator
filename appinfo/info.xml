@@ -14,7 +14,7 @@ The first time you install this app, before using a cron job, you properly want 
 	<licence>AGPL</licence>
 	<author>Roeland Jago Douma</author>
 	<author>Richard Steinmetz</author>
-	<version>3.4.0</version>
+	<version>4.0.0</version>
 	<namespace>PreviewGenerator</namespace>
 	<category>multimedia</category>
 	<website>https://github.com/nextcloud/previewgenerator</website>
@@ -24,8 +24,8 @@ The first time you install this app, before using a cron job, you properly want 
 		<filesystem/>
 	</types>
 	<dependencies>
-		<php min-version="7.2" max-version="8.0" />
-		<nextcloud min-version="20" max-version="23" />
+		<php min-version="7.3" max-version="8.0" />
+		<nextcloud min-version="21" max-version="24" />
 	</dependencies>
 
 	<commands>
