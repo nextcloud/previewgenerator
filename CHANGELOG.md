@@ -1,3 +1,7 @@
+## 3.4.1 - 2021-12-15
+### Fixed
+- Dependency error on Nextcloud 20
+
 ## 3.4.0 - 2021-12-06
 ### Added
 - Skip external mounts with disabled previews (thanks to @hashworks)
