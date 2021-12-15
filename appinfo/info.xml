@@ -14,7 +14,7 @@ The first time you install this app, before using a cron job, you properly want 
 	<licence>AGPL</licence>
 	<author>Roeland Jago Douma</author>
 	<author>Richard Steinmetz</author>
-	<version>3.4.0</version>
+	<version>3.4.1</version>
 	<namespace>PreviewGenerator</namespace>
 	<category>multimedia</category>
 	<website>https://github.com/nextcloud/previewgenerator</website>
