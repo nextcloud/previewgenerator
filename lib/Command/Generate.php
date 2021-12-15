@@ -37,6 +37,8 @@ use OCP\IPreview;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCA\Files_External\Service\GlobalStoragesService;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -74,7 +76,7 @@ class Generate extends Command {
 								IPreview $previewGenerator,
 								IConfig $config,
 								IManager $encryptionManager,
-								?GlobalStoragesService $globalService = null) {
+								ContainerInterface $container) {
 		parent::__construct();
 
 		$this->userManager = $userManager;
@@ -82,7 +84,12 @@ class Generate extends Command {
 		$this->previewGenerator = $previewGenerator;
 		$this->config = $config;
 		$this->encryptionManager = $encryptionManager;
-		$this->globalService = $globalService;
+
+		try {
+			$this->globalService = $container->get(GlobalStoragesService::class);
+		} catch (ContainerExceptionInterface $e) {
+			$this->globalService = null;
+		}
 	}
 
 	protected function configure() {
