@@ -98,3 +98,12 @@ Note:
 ### I want to skip a folder and everything in/under it
 
 Add an empty file with the name `.nomedia` in the folder you wish to skip. All files and subfolders of the folder containing `.nomedia` will also be skipped.
+
+### I want to reset/regenerate all previews
+
+**WARNING:** This is not supported but it has been confirmed to work by multiple users. Proceed at your own risk. Always keep backups around.
+
+1. Remove the folder `your-nextcloud-data-directory/appdata_*/preview`
+2. *Optional:* change parameters `preview_max_x` and `preview_max_y` in `config.php` (e.g., to `512`), and change the `previewgenerator` app parameters `heightSizes`, `squareSizes` and `widthSizes` as per the README (or better yet, to a low value each, e.g. `512`, `256` and `512` respectively)
+3. Run `occ files:scan-app-data` (this will reset generated previews in the database)
+4. Run `occ preview:generate-all [user-id]` (this will run very fast if you did step 2) 
