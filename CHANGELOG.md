@@ -1,3 +1,12 @@
+## 4.0.0 - 2022-02-05
+### Added
+- PHP 8.1 support
+- Nextcloud 24 support
+
+### Removed
+- PHP 7.2 support
+- Nextcloud 20 support
+
 ## 3.4.1 - 2021-12-15
 ### Fixed
 - Dependency error on Nextcloud 20
