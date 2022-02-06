@@ -93,7 +93,7 @@ Note:
  ### I get  "PHP Fatal error:  Allowed memory size of X bytes exhausted"
  You need to increase the memory allowance of PHP, by default it is 128 MB. You do that by changing the memory_limit in the php.ini file.
  
- If you use the docker container you need to create the php.ini file in /usr/local/etc/php first.
+ If you use [the docker container](https://github.com/nextcloud/docker) you need set the environment variable `PHP_MEMORY_LIMIT` instead.
 
 ### I want to skip a folder and everything in/under it
 
