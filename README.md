@@ -43,10 +43,12 @@ This removes the previews from the old preview location that was used before
 Nextcloud 11. That has some issues. Note that the gallery shipped with Nextcloud
 11 did not yet use this location. So you might want to run it again with Nextcloud 12.
 
-### preview:generate-all [user-id]
+### preview:generate-all [--path=PATH ...] [user_id ...]
 
-Loop over all files and try to generate previews for them. If `user-id` is supplied
-just loop over the files for that user.
+Loop over all files and try to generate previews for them. If one or multiple user ids are supplied
+it will just loop over the files of those users. You can also limit the generation to one or more
+paths using `--path="/[username]/files/[folder path]"`, e.g. `--path="/alice/files/Photos"`. Note that
+all given user_ids are ignored if at least one path is specified.
 
 ### preview:pre-generate
 
