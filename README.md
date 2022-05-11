@@ -62,11 +62,6 @@ the app was enabled or the last pregeneration was done).
 Preview generation can be a very long running job. Thus we need a system that
 does not time out.
 
-### It sometimes crashed
-
-Yes this happens. Most of it is due to corrupted files not being handled that gracefully
-in the Nextcloud server. Improvements in this area are coming with Nextcloud 12
-
 ### I get "Command already running"
 
 Yes this happens when the `pre-generate` command crashes. No worries the lock
