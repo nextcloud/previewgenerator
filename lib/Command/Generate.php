@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Richard Steinmetz <richard@steinmetz.cloud>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -50,26 +52,15 @@ class Generate extends Command {
 	/** @var ?GlobalStoragesService */
 	protected $globalService;
 
-	/** @var IUserManager */
-	protected $userManager;
-
-	/** @var IRootFolder */
-	protected $rootFolder;
-
-	/** @var IPreview */
-	protected $previewGenerator;
-
-	/** @var IConfig */
-	protected $config;
-
-	/** @var OutputInterface */
-	protected $output;
-
 	/** @var int[][] */
-	protected $sizes;
+	protected array $sizes;
 
-	/** @var IManager */
-	protected $encryptionManager;
+	protected IUserManager $userManager;
+	protected IRootFolder $rootFolder;
+	protected IPreview $previewGenerator;
+	protected IConfig $config;
+	protected OutputInterface $output;
+	protected IManager $encryptionManager;
 
 	public function __construct(IRootFolder $rootFolder,
 								IUserManager $userManager,
@@ -92,7 +83,7 @@ class Generate extends Command {
 		}
 	}
 
-	protected function configure() {
+	protected function configure(): void {
 		$this
 			->setName('preview:generate-all')
 			->setDescription('Generate previews')
@@ -168,7 +159,7 @@ class Generate extends Command {
 		return $mountPaths;
 	}
 
-	private function generatePathPreviews(IUser $user, string $path) {
+	private function generatePathPreviews(IUser $user, string $path): void {
 		\OC_Util::tearDownFS();
 		\OC_Util::setupFS($user->getUID());
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
@@ -183,7 +174,7 @@ class Generate extends Command {
 		$this->parseFolder($pathFolder, $noPreviewMountPaths);
 	}
 
-	private function generateUserPreviews(IUser $user) {
+	private function generateUserPreviews(IUser $user): void {
 		\OC_Util::tearDownFS();
 		\OC_Util::setupFS($user->getUID());
 
@@ -222,7 +213,7 @@ class Generate extends Command {
 		}
 	}
 
-	private function parseFile(File $file) {
+	private function parseFile(File $file): void {
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
 			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
 				$this->output->writeln('Generating previews for ' . $file->getPath());

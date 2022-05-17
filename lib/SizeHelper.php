@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2017, Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Richard Steinmetz <richard@steinmetz.cloud>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -28,6 +30,11 @@ namespace OCA\PreviewGenerator;
 use OCP\IConfig;
 
 class SizeHelper {
+
+	/**
+	 * @param IConfig $config
+	 * @return int[][]
+	 */
 	public static function calculateSizes(IConfig $config): array {
 		/*
 		 * First calculate the systems max sizes

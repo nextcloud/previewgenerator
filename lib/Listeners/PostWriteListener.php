@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Richard Steinmetz <richard@steinmetz.cloud>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,6 +24,7 @@ declare(strict_types=1);
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 namespace OCA\PreviewGenerator\Listeners;
 
 use OCP\EventDispatcher\Event;
@@ -32,12 +35,8 @@ use OCP\IDBConnection;
 use OCP\IUserManager;
 
 class PostWriteListener implements IEventListener {
-
-	/** @var IDBConnection */
-	private $connection;
-
-	/** @var IUserManager */
-	private $userManager;
+	private IDBConnection $connection;
+	private IUserManager $userManager;
 
 	public function __construct(IDBConnection $connection,
 								IUserManager $userManager) {
