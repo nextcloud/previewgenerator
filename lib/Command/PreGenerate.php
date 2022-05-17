@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Richard Steinmetz <richard@steinmetz.cloud>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -20,6 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 namespace OCA\PreviewGenerator\Command;
 
 use OCA\PreviewGenerator\SizeHelper;
@@ -38,35 +41,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PreGenerate extends Command {
 
-	/** @var string */
-	protected $appName;
-
-	/** @var IUserManager */
-	protected $userManager;
-
-	/** @var IRootFolder */
-	protected $rootFolder;
-
-	/** @var IPreview */
-	protected $previewGenerator;
-
-	/** @var IConfig */
-	protected $config;
-
-	/** @var IDBConnection */
-	protected $connection;
-
-	/** @var OutputInterface */
-	protected $output;
-
 	/** @var int[][] */
-	protected $sizes;
+	protected array $sizes;
 
-	/** @var IManager */
-	protected $encryptionManager;
-
-	/** @var ITimeFactory */
-	protected $time;
+	protected string $appName;
+	protected IUserManager $userManager;
+	protected IRootFolder $rootFolder;
+	protected IPreview $previewGenerator;
+	protected IConfig $config;
+	protected IDBConnection $connection;
+	protected OutputInterface $output;
+	protected IManager $encryptionManager;
+	protected ITimeFactory $time;
 
 	/**
 	 * @param string $appName
