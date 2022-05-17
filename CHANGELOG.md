@@ -1,3 +1,16 @@
+## 5.0.0 - 2022-05-17
+### Added
+- Improve documentation around memory_limit (thanks to @proletarius101)
+- Improve documentation of preview:generate-all command
+
+### Changed
+- Updated maintainers
+
+### Removed
+- PHP 7.3 support
+- Nextcloud 21 support
+- preview:delete_old command
+
 ## 4.0.0 - 2022-02-05
 ### Added
 - PHP 8.1 support
