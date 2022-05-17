@@ -29,7 +29,6 @@ The first time you install this app, before using a cron job, you properly want 
 
 	<commands>
 		<command>OCA\PreviewGenerator\Command\Generate</command>
-		<command>OCA\PreviewGenerator\Command\DeleteOld</command>
 		<command>OCA\PreviewGenerator\Command\PreGenerate</command>
 	</commands>
 </info>
