@@ -37,12 +37,6 @@ are running on the time this takes can vary.
 
 ## Commands
 
-### preview:delete_old
-
-This removes the previews from the old preview location that was used before
-Nextcloud 11. That has some issues. Note that the gallery shipped with Nextcloud
-11 did not yet use this location. So you might want to run it again with Nextcloud 12.
-
 ### preview:generate-all [--path=PATH ...] [user_id ...]
 
 Loop over all files and try to generate previews for them. If one or multiple user ids are supplied
