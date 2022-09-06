@@ -24,7 +24,7 @@ The first time you install this app, before using a cron job, you properly want 
 	</types>
 	<dependencies>
 		<php min-version="7.4" max-version="8.1" />
-		<nextcloud min-version="22" max-version="25" />
+		<nextcloud min-version="23" max-version="25" />
 	</dependencies>
 
 	<commands>
