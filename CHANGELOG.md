@@ -1,3 +1,10 @@
+## 5.1.0 - 2022-09-23
+### Added
+- Nextcloud 25 support
+
+### Removed
+- Nextcloud 22 support
+
 ## 5.0.0 - 2022-05-17
 ### Added
 - Improve documentation around memory_limit (thanks to @proletarius101)
