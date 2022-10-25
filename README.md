@@ -12,7 +12,7 @@ requested before it is pre-generated it will still be shown.
 ## How to install
 
 * Install directly from within your Nextcloud from the [app store](https://apps.nextcloud.com/apps/previewgenerator)
-* Clone this repository in you Nextcloud app folder
+* Clone this repository into your Nextcloud app folder
 
 ## How to use the app
 
