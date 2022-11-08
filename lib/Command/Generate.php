@@ -52,8 +52,7 @@ class Generate extends Command {
 	/** @var ?GlobalStoragesService */
 	protected $globalService;
 
-	/** @var int[][] */
-	protected array $sizes;
+	protected array $specifications;
 
 	protected IUserManager $userManager;
 	protected IRootFolder $rootFolder;
@@ -110,7 +109,19 @@ class Generate extends Command {
 		$output->setFormatter($formatter);
 		$this->output = $output;
 
-		$this->sizes = SizeHelper::calculateSizes($this->config);
+		// Generate preview specifications once
+		$sizes = SizeHelper::calculateSizes($this->config);
+		$this->specifications = array_merge(
+			array_map(static function ($squareSize) {
+				return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
+			}, $sizes['square']),
+			array_map(static function ($heightSize) {
+				return ['width' => -1, 'height' => $heightSize, 'crop' => false];
+			}, $sizes['height']),
+			array_map(static function ($widthSize) {
+				return ['width' => $widthSize, 'height' => -1, 'crop' => false];
+			}, $sizes['width'])
+		);
 
 		$inputPaths = $input->getOption('path');
 		if ($inputPaths) {
@@ -220,18 +231,7 @@ class Generate extends Command {
 			}
 
 			try {
-				$specifications = array_merge(
-					array_map(function ($squareSize) {
-						return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
-					}, $this->sizes['square']),
-					array_map(function ($heightSize) {
-						return ['width' => -1, 'height' => $heightSize, 'crop' => false];
-					}, $this->sizes['height']),
-					array_map(function ($widthSize) {
-						return ['width' => $widthSize, 'height' => -1, 'crop' => false];
-					}, $this->sizes['width'])
-				);
-				$this->previewGenerator->generatePreviews($file, $specifications);
+				$this->previewGenerator->generatePreviews($file, $this->specifications);
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
 			} catch (\InvalidArgumentException $e) {
