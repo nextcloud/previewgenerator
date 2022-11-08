@@ -1,3 +1,7 @@
+## 5.1.1 - 2022-11-08
+### Fixed
+- Generate preview specifications once
+
 ## 5.1.0 - 2022-09-23
 ### Added
 - Nextcloud 25 support
