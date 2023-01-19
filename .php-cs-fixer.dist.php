@@ -9,6 +9,7 @@ use Nextcloud\CodingStandard\Config;
 $config = new Config();
 $config
 	->getFinder()
+	->ignoreVCSIgnored(true)
 	->notPath('build')
 	->notPath('l10n')
 	->notPath('src')
