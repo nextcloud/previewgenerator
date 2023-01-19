@@ -35,10 +35,10 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\Files\Events\Node\NodeWrittenEvent;
 
 class Application extends App implements IBootstrap {
-	public const APPNAME = 'previewgenerator';
+	public const APP_ID = 'previewgenerator';
 
 	public function __construct() {
-		parent::__construct(self::APPNAME);
+		parent::__construct(self::APP_ID);
 	}
 
 	public function register(IRegistrationContext $context): void {

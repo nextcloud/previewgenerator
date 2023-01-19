@@ -65,7 +65,7 @@ class PreGenerate extends Command {
 	 * @param IManager $encryptionManager
 	 * @param ITimeFactory $time
 	 */
-	public function __construct($appName,
+	public function __construct(string $appName,
 						 IRootFolder $rootFolder,
 						 IUserManager $userManager,
 						 IPreview $previewGenerator,
@@ -85,18 +85,13 @@ class PreGenerate extends Command {
 		$this->time = $time;
 	}
 
-	protected function configure() {
+	protected function configure(): void {
 		$this
 			->setName('preview:pre-generate')
 			->setDescription('Pre generate previews');
 	}
 
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 * @return int
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		if ($this->encryptionManager->isEnabled()) {
 			$output->writeln('Encryption is enabled. Aborted.');
 			return 1;
@@ -122,7 +117,7 @@ class PreGenerate extends Command {
 		return 0;
 	}
 
-	private function startProcessing() {
+	private function startProcessing(): void {
 		while (true) {
 			$qb = $this->connection->getQueryBuilder();
 			$qb->select('*')
@@ -152,7 +147,7 @@ class PreGenerate extends Command {
 		}
 	}
 
-	private function processRow($row) {
+	private function processRow($row): void {
 		//Get user
 		$user = $this->userManager->get($row['uid']);
 
@@ -183,7 +178,7 @@ class PreGenerate extends Command {
 		}
 	}
 
-	private function processFile(File $file) {
+	private function processFile(File $file): void {
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
 			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
 				$this->output->writeln('Generating previews for ' . $file->getPath());
@@ -191,13 +186,13 @@ class PreGenerate extends Command {
 
 			try {
 				$specifications = array_merge(
-					array_map(function ($squareSize) {
+					array_map(static function ($squareSize) {
 						return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
 					}, $this->sizes['square']),
-					array_map(function ($heightSize) {
+					array_map(static function ($heightSize) {
 						return ['width' => -1, 'height' => $heightSize, 'crop' => false];
 					}, $this->sizes['height']),
-					array_map(function ($widthSize) {
+					array_map(static function ($widthSize) {
 						return ['width' => $widthSize, 'height' => -1, 'crop' => false];
 					}, $this->sizes['width'])
 				);
@@ -211,19 +206,19 @@ class PreGenerate extends Command {
 		}
 	}
 
-	private function setPID() {
+	private function setPID(): void {
 		$this->config->setAppValue($this->appName, 'pid', posix_getpid());
 	}
 
-	private function clearPID() {
+	private function clearPID(): void {
 		$this->config->deleteAppValue($this->appName, 'pid');
 	}
 
-	private function getPID() {
+	private function getPID(): int {
 		return (int)$this->config->getAppValue($this->appName, 'pid', -1);
 	}
 
-	private function checkAlreadyRunning() {
+	private function checkAlreadyRunning(): bool {
 		$pid = $this->getPID();
 
 		// No PID set so just continue
