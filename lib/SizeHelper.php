@@ -30,7 +30,6 @@ namespace OCA\PreviewGenerator;
 use OCP\IConfig;
 
 class SizeHelper {
-
 	/**
 	 * @param IConfig $config
 	 * @return int[][]

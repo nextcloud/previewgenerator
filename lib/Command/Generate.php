@@ -48,7 +48,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command {
-
 	/** @var ?GlobalStoragesService */
 	protected $globalService;
 

@@ -35,7 +35,6 @@ use Test\TestCase;
  * @group DB
  */
 class WatcherTest extends TestCase {
-
 	/** @var IDBConnection */
 	private $connection;
 
