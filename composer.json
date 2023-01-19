@@ -1,5 +1,5 @@
 {
-	"name": "rullzer/previewgenerator",
+	"name": "nextcloud/previewgenerator",
 	"config": {
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
