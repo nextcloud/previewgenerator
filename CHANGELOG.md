@@ -1,3 +1,17 @@
+# Changelog
+
+## 5.2.0 - 2023-02-10
+### Added
+- Support for Nextcloud 26
+- Support for PHP 8.2
+
+### Removed
+- Support for Nextcloud 23 (EOL)
+- Support for PHP 7.4 (EOL)
+
+### Changed
+- Modernize code
+
 ## 5.1.1 - 2022-11-08
 ### Fixed
 - Generate preview specifications once
