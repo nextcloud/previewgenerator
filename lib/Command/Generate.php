@@ -48,7 +48,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command {
-	protected GlobalStoragesService|null $globalService;
+	protected ?GlobalStoragesService $globalService;
 	protected array $specifications;
 	protected IUserManager $userManager;
 	protected IRootFolder $rootFolder;
