@@ -66,19 +66,19 @@ will be released after 30 minutes of inactivity from the app. So go grab a cooki
 This is possible since version 1.0.8. Just set the correct values via the command line
 
 ```
-./occ config:app:set --value="32 64 1024"  previewgenerator squareSizes
-./occ config:app:set --value="64 128 1024" previewgenerator widthSizes
+./occ config:app:set --value="64 256 1024"  previewgenerator squareSizes
+./occ config:app:set --value="64 256 1024" previewgenerator widthSizes
 ./occ config:app:set --value="64 256 1024" previewgenerator heightSizes
 ```
 
 This will only generate:
- * square previews of: 32x32, 64x64 and 1024x1024
- * aspect ratio previews with a width of: 64, 128 and 1024
+ * square previews of: 64x64, 256x256 and 1024x1024
+ * aspect ratio previews with a width of: 64, 256 and 1024
  * aspect ratio previews with a height of: 64, 256 and 1024
 
 Note:
- * preview sizes are always a power of 2.
- * The smallest size is 32
+ * preview sizes are always a power of 4.
+ * The smallest size is 64
  * The max size is determined by your preview settings in config.php
  
  ### I get  "PHP Fatal error:  Allowed memory size of X bytes exhausted"
