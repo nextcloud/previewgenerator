@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.2.2 - 2023-04-04
+### Changed
+- Fix PHP 8.2 deprecation warnings (thanks to @dotlambda)
+- Adjust requested preview sizes
+
 ## 5.2.1 - 2023-02-24
 ### Added
 - Support for PHP 7.4
