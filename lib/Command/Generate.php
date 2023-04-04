@@ -232,7 +232,7 @@ class Generate extends Command {
 				// Maybe log that previews could not be generated?
 			} catch (\InvalidArgumentException $e) {
 				$error = $e->getMessage();
-				$this->output->writeln("<error>${error}</error>");
+				$this->output->writeln("<error>{$error}</error>");
 			}
 		}
 	}
