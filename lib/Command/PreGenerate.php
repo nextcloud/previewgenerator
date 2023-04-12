@@ -179,6 +179,12 @@ class PreGenerate extends Command {
 	}
 
 	private function processFile(File $file): void {
+		$absPath = ltrim($file->getPath(), '/');
+		$app = explode('/', $absPath)[1];
+		if ($app === 'files_trashbin') {
+			return;
+		}
+
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
 			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
 				$this->output->writeln('Generating previews for ' . $file->getPath());
