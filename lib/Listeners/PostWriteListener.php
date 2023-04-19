@@ -39,7 +39,7 @@ class PostWriteListener implements IEventListener {
 	private IUserManager $userManager;
 
 	public function __construct(IDBConnection $connection,
-								IUserManager $userManager) {
+		IUserManager $userManager) {
 		$this->connection = $connection;
 		$this->userManager = $userManager;
 	}

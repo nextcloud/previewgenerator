@@ -66,13 +66,13 @@ class PreGenerate extends Command {
 	 * @param ITimeFactory $time
 	 */
 	public function __construct(string $appName,
-						 IRootFolder $rootFolder,
-						 IUserManager $userManager,
-						 IPreview $previewGenerator,
-						 IConfig $config,
-						 IDBConnection $connection,
-						 IManager $encryptionManager,
-						 ITimeFactory $time) {
+		IRootFolder $rootFolder,
+		IUserManager $userManager,
+		IPreview $previewGenerator,
+		IConfig $config,
+		IDBConnection $connection,
+		IManager $encryptionManager,
+		ITimeFactory $time) {
 		parent::__construct();
 
 		$this->appName = $appName;
