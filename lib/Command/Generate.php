@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace OCA\PreviewGenerator\Command;
 
+use OCA\Files_External\Service\GlobalStoragesService;
 use OCA\PreviewGenerator\SizeHelper;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
@@ -38,7 +39,6 @@ use OCP\IConfig;
 use OCP\IPreview;
 use OCP\IUser;
 use OCP\IUserManager;
-use OCA\Files_External\Service\GlobalStoragesService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -58,11 +58,11 @@ class Generate extends Command {
 	protected IManager $encryptionManager;
 
 	public function __construct(IRootFolder $rootFolder,
-								IUserManager $userManager,
-								IPreview $previewGenerator,
-								IConfig $config,
-								IManager $encryptionManager,
-								ContainerInterface $container) {
+		IUserManager $userManager,
+		IPreview $previewGenerator,
+		IConfig $config,
+		IManager $encryptionManager,
+		ContainerInterface $container) {
 		parent::__construct();
 
 		$this->userManager = $userManager;

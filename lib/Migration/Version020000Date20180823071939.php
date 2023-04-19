@@ -26,8 +26,8 @@ declare(strict_types=1);
 namespace OCA\PreviewGenerator\Migration;
 
 use OCP\DB\ISchemaWrapper;
-use OCP\Migration\SimpleMigrationStep;
 use OCP\Migration\IOutput;
+use OCP\Migration\SimpleMigrationStep;
 
 class Version020000Date20180823071939 extends SimpleMigrationStep {
 	/**
