@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.3 - 2023-04-19
+### Changed
+- Skip deleted files
+
 ## 5.2.2 - 2023-04-04
 ### Changed
 - Fix PHP 8.2 deprecation warnings (thanks to @dotlambda)
