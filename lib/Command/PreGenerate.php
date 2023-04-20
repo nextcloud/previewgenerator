@@ -180,8 +180,8 @@ class PreGenerate extends Command {
 
 	private function processFile(File $file): void {
 		$absPath = ltrim($file->getPath(), '/');
-		$app = explode('/', $absPath)[1];
-		if ($app === 'files_trashbin') {
+		$pathComponents = explode('/', $absPath);
+		if (isset($pathComponents[1]) && $pathComponents[1] === 'files_trashbin') {
 			return;
 		}
 
