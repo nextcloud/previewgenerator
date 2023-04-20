@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.4 - 2023-04-20
+### Fixed
+- Harden error handling of deleted files check
+
 ## 5.2.3 - 2023-04-19
 ### Changed
 - Skip deleted files
