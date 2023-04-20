@@ -13,7 +13,7 @@ The first time you install this app, before using a cron job, you properly want 
 	</description>
 	<licence>AGPL</licence>
 	<author>Richard Steinmetz</author>
-	<version>5.2.3</version>
+	<version>5.2.4</version>
 	<namespace>PreviewGenerator</namespace>
 	<category>multimedia</category>
 	<website>https://github.com/nextcloud/previewgenerator</website>
