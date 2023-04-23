@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Joas Schilling <coding@schilljs.com>
+ * @author Richard Steinmetz <richard@steinmetz.cloud>
  *
  * @license AGPL-3.0
  *
@@ -36,11 +39,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyleInterface;
  * @package OCA\PreviewGenerator\Command
  */
 class TimestampFormatter implements OutputFormatterInterface {
-	/** @var IConfig */
-	protected $config;
-
-	/** @var OutputFormatterInterface */
-	protected $formatter;
+	protected IConfig $config;
+	protected OutputFormatterInterface $formatter;
 
 	/**
 	 * @param IConfig $config
@@ -56,7 +56,7 @@ class TimestampFormatter implements OutputFormatterInterface {
 	 *
 	 * @param bool $decorated Whether to decorate the messages or not
 	 */
-	public function setDecorated($decorated) {
+	public function setDecorated($decorated): void {
 		$this->formatter->setDecorated($decorated);
 	}
 
@@ -75,7 +75,7 @@ class TimestampFormatter implements OutputFormatterInterface {
 	 * @param string $name The style name
 	 * @param OutputFormatterStyleInterface $style The style instance
 	 */
-	public function setStyle($name, OutputFormatterStyleInterface $style) {
+	public function setStyle($name, OutputFormatterStyleInterface $style): void {
 		$this->formatter->setStyle($name, $style);
 	}
 
@@ -108,7 +108,6 @@ class TimestampFormatter implements OutputFormatterInterface {
 	 * log timezone and dateformat, e.g. "2015-06-23T17:24:37+02:00"
 	 */
 	public function format($message): string {
-
 		$timeZone = $this->config->getSystemValue('logtimezone', 'UTC');
 		$timeZone = $timeZone !== null ? new \DateTimeZone($timeZone) : null;
 

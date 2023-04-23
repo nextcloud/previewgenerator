@@ -1,11 +1,14 @@
 <?php
+
 declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Richard Steinmetz <richard@steinmetz.cloud>
  *
- * @license GNU AGPL version 3 or any later version
+ * @license AGPL-3.0-or-later
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -21,28 +24,32 @@ declare(strict_types=1);
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-namespace OCA\PreviewGenerator;
 
+namespace OCA\PreviewGenerator\Listeners;
+
+use OCP\EventDispatcher\Event;
+use OCP\EventDispatcher\IEventListener;
+use OCP\Files\Events\Node\NodeWrittenEvent;
 use OCP\Files\Folder;
-use OCP\Files\Node;
 use OCP\IDBConnection;
 use OCP\IUserManager;
 
-class Watcher {
-
-	/** @var IDBConnection */
-	private $connection;
-
-	/** @var IUserManager */
-	private $userManager;
+class PostWriteListener implements IEventListener {
+	private IDBConnection $connection;
+	private IUserManager $userManager;
 
 	public function __construct(IDBConnection $connection,
-								IUserManager $userManager) {
+		IUserManager $userManager) {
 		$this->connection = $connection;
 		$this->userManager = $userManager;
 	}
 
-	public function postWrite(Node $node) {
+	public function handle(Event $event): void {
+		if (!($event instanceof NodeWrittenEvent)) {
+			return;
+		}
+
+		$node = $event->getNode();
 		$absPath = ltrim($node->getPath(), '/');
 		$owner = explode('/', $absPath)[0];
 

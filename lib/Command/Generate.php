@@ -1,11 +1,14 @@
 <?php
+
 declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Richard Steinmetz <richard@steinmetz.cloud>
  *
- * @license GNU AGPL version 3 or any later version
+ * @license AGPL-3.0-or-later
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,17 +27,21 @@ declare(strict_types=1);
 
 namespace OCA\PreviewGenerator\Command;
 
+use OCA\Files_External\Service\GlobalStoragesService;
 use OCA\PreviewGenerator\SizeHelper;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\Files\StorageNotAvailableException;
 use OCP\IConfig;
 use OCP\IDBConnection;
 use OCP\IPreview;
 use OCP\IUser;
 use OCP\IUserManager;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -43,36 +50,39 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command {
 
+	/** @var ?GlobalStoragesService */
+	protected ?GlobalStoragesService $globalService;
+
+	/** @var array */
+	protected array $specifications;
 	/** @var IUserManager */
-	protected $userManager;
+	protected IUserManager $userManager;
 
 	/** @var IRootFolder */
-	protected $rootFolder;
+	protected IRootFolder $rootFolder;
 
 	/** @var IPreview */
-	protected $previewGenerator;
+	protected IPreview $previewGenerator;
 
 	/** @var IConfig */
-	protected $config;
+	protected IConfig $config;
 
 	/** @var IDBConnection */
 	protected $connection;
 
 	/** @var OutputInterface */
-	protected $output;
-
-	/** @var int[][] */
-	protected $sizes;
+	protected OutputInterface $output;
 
 	/** @var IManager */
-	protected $encryptionManager;
+	protected IManager $encryptionManager;
 
 	public function __construct(IRootFolder $rootFolder,
-								IUserManager $userManager,
-								IPreview $previewGenerator,
-								IConfig $config,
-								IDBConnection $connection,
-								IManager $encryptionManager) {
+		IUserManager $userManager,
+		IPreview $previewGenerator,
+		IConfig $config,
+		IDBConnection $connection,
+		IManager $encryptionManager,
+		ContainerInterface $container) {
 		parent::__construct();
 
 		$this->userManager = $userManager;
@@ -81,21 +91,27 @@ class Generate extends Command {
 		$this->config = $config;
 		$this->connection = $connection;
 		$this->encryptionManager = $encryptionManager;
+
+		try {
+			$this->globalService = $container->get(GlobalStoragesService::class);
+		} catch (ContainerExceptionInterface $e) {
+			$this->globalService = null;
+		}
 	}
 
-	protected function configure() {
+	protected function configure(): void {
 		$this
 			->setName('preview:generate-all')
 			->setDescription('Generate previews')
 			->addArgument(
 				'user_id',
-				InputArgument::OPTIONAL,
-				'Generate previews for the given user'
+				InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+				'Generate previews for the given user(s)'
 			)->addOption(
 				'path',
 				'p',
-				InputOption::VALUE_OPTIONAL,
-				'limit scan to this path, eg. --path="/alice/files/Photos", the user_id is determined by the path and the user_id parameter is ignored'
+				InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+				'limit scan to this path, eg. --path="/alice/files/Photos", the user_id is determined by the path and all user_id arguments are ignored, multiple usages allowed'
 			);
 	}
 
@@ -110,26 +126,42 @@ class Generate extends Command {
 		$output->setFormatter($formatter);
 		$this->output = $output;
 
-		$this->sizes = SizeHelper::calculateSizes($this->config);
+		// Generate preview specifications once
+		$sizes = SizeHelper::calculateSizes($this->config);
+		$this->specifications = array_merge(
+			array_map(static function ($squareSize) {
+				return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
+			}, $sizes['square']),
+			array_map(static function ($heightSize) {
+				return ['width' => -1, 'height' => $heightSize, 'crop' => false];
+			}, $sizes['height']),
+			array_map(static function ($widthSize) {
+				return ['width' => $widthSize, 'height' => -1, 'crop' => false];
+			}, $sizes['width'])
+		);
 
-		$inputPath = $input->getOption('path');
-		if ($inputPath) {
-			$inputPath = '/' . trim($inputPath, '/');
-			list (, $userId,) = explode('/', $inputPath, 3);
-			$user = $this->userManager->get($userId);
-			if ($user !== null) {
-				$this->generatePathPreviews($user, $inputPath);
+		$inputPaths = $input->getOption('path');
+		if ($inputPaths) {
+			foreach ($inputPaths as $inputPath) {
+				$inputPath = '/' . trim($inputPath, '/');
+				[, $userId,] = explode('/', $inputPath, 3);
+				$user = $this->userManager->get($userId);
+				if ($user !== null) {
+					$this->generatePathPreviews($user, $inputPath);
+				}
 			}
 		} else {
-			$userId = $input->getArgument('user_id');
-			if ($userId === null) {
+			$userIds = $input->getArgument('user_id');
+			if (count($userIds) === 0) {
 				$this->userManager->callForSeenUsers(function (IUser $user) {
 					$this->generateUserPreviews($user);
 				});
 			} else {
-				$user = $this->userManager->get($userId);
-				if ($user !== null) {
-					$this->generateUserPreviews($user);
+				foreach ($userIds as $userId) {
+					$user = $this->userManager->get($userId);
+					if ($user !== null) {
+						$this->generateUserPreviews($user);
+					}
 				}
 			}
 		}
@@ -137,7 +169,25 @@ class Generate extends Command {
 		return 0;
 	}
 
-	private function generatePathPreviews(IUser $user, string $path) {
+	private function getNoPreviewMountPaths(IUser $user): array {
+		if ($this->globalService === null) {
+			return [];
+		}
+		$mountPaths = [];
+		$userId = $user->getUID();
+		$mounts = $this->globalService->getStorageForAllUsers();
+		foreach ($mounts as $mount) {
+			if (in_array($userId, $mount->getApplicableUsers()) &&
+				$mount->getMountOptions()['previews'] === false
+			) {
+				$userFolder = $this->rootFolder->getUserFolder($userId)->getPath();
+				array_push($mountPaths, $userFolder.$mount->getMountPoint());
+			}
+		}
+		return $mountPaths;
+	}
+
+	private function generatePathPreviews(IUser $user, string $path): void {
 		\OC_Util::tearDownFS();
 		\OC_Util::setupFS($user->getUID());
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
@@ -148,103 +198,99 @@ class Generate extends Command {
 			return;
 		}
 		$pathFolder = $userFolder->get($relativePath);
-		$this->processFolder($pathFolder, $user);
+		$noPreviewMountPaths = $this->getNoPreviewMountPaths($user);
+		$this->parseFolder($pathFolder, $noPreviewMountPaths, $user);
 	}
 
-	private function generateUserPreviews(IUser $user) {
+	private function generateUserPreviews(IUser $user): void {
 		\OC_Util::tearDownFS();
 		\OC_Util::setupFS($user->getUID());
 
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
-		$this->processFolder($userFolder, $user);
+		$noPreviewMountPaths = $this->getNoPreviewMountPaths($user);
+		$this->parseFolder($userFolder, $noPreviewMountPaths, $user);
 	}
 
-	private function processFolder(Folder $folder, IUser $user) {
-		// Respect the '.nomedia' file. If present don't traverse the folder
-		if ($folder->nodeExists('.nomedia')) {
-			$this->output->writeln('Skipping folder ' . $folder->getPath());
-			return;
-		}
+	private function parseFolder(Folder $folder, array $noPreviewMountPaths, IUser $user): void {
+		try {
+			$folderPath = $folder->getPath();
 
-		// random sleep between 0 and 50ms to avoid collision between 2 processes
-		usleep(rand(0,50000));
+			// Respect the '.nomedia' file. If present don't traverse the folder
+			// Same for external mounts with previews disabled
+			if ($folder->nodeExists('.nomedia') || in_array($folderPath, $noPreviewMountPaths)) {
+				$this->output->writeln('Skipping folder ' . $folderPath);
+				return;
+			}
 
-		$this->output->writeln('Scanning folder ' . $folder->getPath());
+			$this->output->writeln('Scanning folder ' . $folderPath);
 
-		$nodes = $folder->getDirectoryListing();
+			$nodes = $folder->getDirectoryListing();
 
-		foreach ($nodes as $node) {
-			if ($node instanceof Folder) {
-				$this->processFolder($node, $user);
-			} else if ($node instanceof File) {
-				$is_locked = false;
-				$qb = $this->connection->getQueryBuilder();
-				$row = $qb->select('*')
-                                  ->from('preview_generation')
-                                  ->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
-                                  ->setMaxResults(1)
-                                  ->execute()
-                                  ->fetch();
-				if ($row !== false) {
-					if ($row['locked'] == 1) {
-						// already being processed
-						$is_locked = true;
+			foreach ($nodes as $node) {
+				if ($node instanceof Folder) {
+					$this->parseFolder($node, $noPreviewMountPaths);
+				} else if ($node instanceof File) {
+					$is_locked = false;
+					$qb = $this->connection->getQueryBuilder();
+					$row = $qb->select('*')
+						->from('preview_generation')
+						->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
+						->setMaxResults(1)
+						->execute()
+						->fetch();
+					if ($row !== false) {
+						if ($row['locked'] == 1) {
+							// already being processed
+							$is_locked = true;
+						} else {
+							$qb->update('preview_generation')
+								->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
+								->set('locked', $qb->createNamedParameter(true))
+								->execute();
+						}
 					} else {
-						$qb->update('preview_generation')
-						   ->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
-						   ->set('locked', $qb->createNamedParameter(true))
-						   ->execute();
+						$qb->insert('preview_generation')
+							->values([
+								'uid'     => $qb->createNamedParameter($user->getUID()),
+								'file_id' => $qb->createNamedParameter($node->getId()),
+								'locked'  => $qb->createNamedParameter(true),
+							])
+							->execute();
 					}
-				} else {
-					$qb->insert('preview_generation')
-				           ->values([
-					       'uid'     => $qb->createNamedParameter($user->getUID()),
-					       'file_id' => $qb->createNamedParameter($node->getId()),
-					       'locked'  => $qb->createNamedParameter(true),
-				           ])
-					   ->execute();
-				}
 
-				if ($is_locked === false) {
-					try {
-						$this->processFile($node);
-					} finally {
-						$qb->delete('preview_generation')
-	 					    ->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
-						    ->execute();
+					if ($is_locked === false) {
+						try {
+							$this->parseFile($node);
+						} finally {
+							$qb->delete('preview_generation')
+								->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
+								->execute();
+						}
 					}
 				}
 			}
+		} catch (StorageNotAvailableException $e) {
+			$this->output->writeln(sprintf('<error>Storage for folder folder %s is not available: %s</error>',
+				$folder->getPath(),
+				$e->getHint()
+			));
 		}
 	}
 
-	private function processFile(File $file) {
+	private function parseFile(File $file): void {
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
 			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
 				$this->output->writeln('Generating previews for ' . $file->getPath());
 			}
 
 			try {
-				foreach ($this->sizes['square'] as $size) {
-					$this->previewGenerator->getPreview($file, $size, $size, true);
-				}
-
-				// Height previews
-				foreach ($this->sizes['height'] as $height) {
-					$this->previewGenerator->getPreview($file, -1, $height, false);
-				}
-
-				// Width previews
-				foreach ($this->sizes['width'] as $width) {
-					$this->previewGenerator->getPreview($file, $width, -1, false);
-				}
+				$this->previewGenerator->generatePreviews($file, $this->specifications);
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
 			} catch (\InvalidArgumentException $e) {
 				$error = $e->getMessage();
-				$this->output->writeln("<error>${error}</error>");
+				$this->output->writeln("<error>{$error}</error>");
 			}
 		}
 	}
-
 }

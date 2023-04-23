@@ -35,7 +35,6 @@ use Test\TestCase;
  * @group DB
  */
 class WatcherTest extends TestCase {
-
 	/** @var IDBConnection */
 	private $connection;
 
@@ -45,7 +44,7 @@ class WatcherTest extends TestCase {
 	/** @var Watcher */
 	private $watcher;
 
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 
 		$this->connection = \OC::$server->getDatabaseConnection();

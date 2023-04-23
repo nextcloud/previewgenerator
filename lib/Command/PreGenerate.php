@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2016, Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Richard Steinmetz <richard@steinmetz.cloud>
  *
- * @license GNU AGPL version 3 or any later version
+ * @license AGPL-3.0-or-later
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,6 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 namespace OCA\PreviewGenerator\Command;
 
 use OCA\PreviewGenerator\SizeHelper;
@@ -34,40 +39,21 @@ use OCP\IPreview;
 use OCP\IUserManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PreGenerate extends Command {
-
-	/** @var string */
-	protected $appName;
-
-	/** @var IUserManager */
-	protected $userManager;
-
-	/** @var IRootFolder */
-	protected $rootFolder;
-
-	/** @var IPreview */
-	protected $previewGenerator;
-
-	/** @var IConfig */
-	protected $config;
-
-	/** @var IDBConnection */
-	protected $connection;
-
-	/** @var OutputInterface */
-	protected $output;
-
 	/** @var int[][] */
-	protected $sizes;
+	protected array $sizes;
 
-	/** @var IManager */
-	protected $encryptionManager;
-
-	/** @var ITimeFactory */
-	protected $time;
+	protected string $appName;
+	protected IUserManager $userManager;
+	protected IRootFolder $rootFolder;
+	protected IPreview $previewGenerator;
+	protected IConfig $config;
+	protected IDBConnection $connection;
+	protected OutputInterface $output;
+	protected IManager $encryptionManager;
+	protected ITimeFactory $time;
 
 	/**
 	 * @param string $appName
@@ -79,14 +65,14 @@ class PreGenerate extends Command {
 	 * @param IManager $encryptionManager
 	 * @param ITimeFactory $time
 	 */
-	public function __construct($appName,
-						 IRootFolder $rootFolder,
-						 IUserManager $userManager,
-						 IPreview $previewGenerator,
-						 IConfig $config,
-						 IDBConnection $connection,
-						 IManager $encryptionManager,
-						 ITimeFactory $time) {
+	public function __construct(string $appName,
+		IRootFolder $rootFolder,
+		IUserManager $userManager,
+		IPreview $previewGenerator,
+		IConfig $config,
+		IDBConnection $connection,
+		IManager $encryptionManager,
+		ITimeFactory $time) {
 		parent::__construct();
 
 		$this->appName = $appName;
@@ -99,18 +85,13 @@ class PreGenerate extends Command {
 		$this->time = $time;
 	}
 
-	protected function configure() {
+	protected function configure(): void {
 		$this
 			->setName('preview:pre-generate')
 			->setDescription('Pre generate previews');
 	}
 
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 * @return int
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		if ($this->encryptionManager->isEnabled()) {
 			$output->writeln('Encryption is enabled. Aborted.');
 			return 1;
@@ -127,11 +108,11 @@ class PreGenerate extends Command {
 		return 0;
 	}
 
-	private function startProcessing() {
+	private function startProcessing(): void {
 		// random sleep between 0 and 50ms to avoid collision between 2 processes
 		usleep(rand(0,50000));
 
-		while(true) {
+		while (true) {
 			$qb = $this->connection->getQueryBuilder();
 			$row = $qb->select('*')
 				->from('preview_generation')
@@ -158,13 +139,16 @@ class PreGenerate extends Command {
 		}
 	}
 
-	private function processRow($row) {
+	private function processRow($row): void {
 		//Get user
 		$user = $this->userManager->get($row['uid']);
 
 		if ($user === null) {
 			return;
 		}
+
+		\OC_Util::tearDownFS();
+		\OC_Util::setupFS($row['uid']);
 
 		try {
 			$userFolder = $this->rootFolder->getUserFolder($user->getUID());
@@ -186,26 +170,31 @@ class PreGenerate extends Command {
 		}
 	}
 
-	private function processFile(File $file) {
+	private function processFile(File $file): void {
+		$absPath = ltrim($file->getPath(), '/');
+		$pathComponents = explode('/', $absPath);
+		if (isset($pathComponents[1]) && $pathComponents[1] === 'files_trashbin') {
+			return;
+		}
+
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
 			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
 				$this->output->writeln('Generating previews for ' . $file->getPath());
 			}
 
 			try {
-				foreach ($this->sizes['square'] as $size) {
-					$this->previewGenerator->getPreview($file, $size, $size, true);
-				}
-
-				// Height previews
-				foreach ($this->sizes['height'] as $height) {
-					$this->previewGenerator->getPreview($file, -1, $height, false);
-				}
-
-				// Width previews
-				foreach ($this->sizes['width'] as $width) {
-					$this->previewGenerator->getPreview($file, $width, -1, false);
-				}
+				$specifications = array_merge(
+					array_map(static function ($squareSize) {
+						return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
+					}, $this->sizes['square']),
+					array_map(static function ($heightSize) {
+						return ['width' => -1, 'height' => $heightSize, 'crop' => false];
+					}, $this->sizes['height']),
+					array_map(static function ($widthSize) {
+						return ['width' => $widthSize, 'height' => -1, 'crop' => false];
+					}, $this->sizes['width'])
+				);
+				$this->previewGenerator->generatePreviews($file, $specifications);
 			} catch (NotFoundException $e) {
                             if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
 				$error = $e->getMessage();
@@ -213,9 +202,37 @@ class PreGenerate extends Command {
                             }
 			} catch (\InvalidArgumentException $e) {
 				$error = $e->getMessage();
-				$this->output->writeln("<error>${error}</error>");
+				$this->output->writeln("<error>{$error}</error>");
 			}
 		}
 	}
 
+	private function setPID(): void {
+		$this->config->setAppValue($this->appName, 'pid', posix_getpid());
+	}
+
+	private function clearPID(): void {
+		$this->config->deleteAppValue($this->appName, 'pid');
+	}
+
+	private function getPID(): int {
+		return (int)$this->config->getAppValue($this->appName, 'pid', -1);
+	}
+
+	private function checkAlreadyRunning(): bool {
+		$pid = $this->getPID();
+
+		// No PID set so just continue
+		if ($pid === -1) {
+			return false;
+		}
+
+		// Get get the gid of non running processes so continue
+		if (posix_getpgid($pid) === false) {
+			return false;
+		}
+
+		// Seems there is already a running process generating previews
+		return true;
+	}
 }
