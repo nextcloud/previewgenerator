@@ -96,6 +96,15 @@ class PreGenerate extends Command {
 			$output->writeln('Encryption is enabled. Aborted.');
 			return 1;
 		}
+		/*
+		this locks it to only be run once
+		if ($this->checkAlreadyRunning()) {
+			$output->writeln('Command is already running.');
+			return 2;
+		}
+
+		$this->setPID();
+		*/
 
 		// Set timestamp output
 		$formatter = new TimestampFormatter($this->config, $output->getFormatter());
@@ -104,6 +113,10 @@ class PreGenerate extends Command {
 
 		$this->sizes = SizeHelper::calculateSizes($this->config);
 		$this->startProcessing();
+
+		/*
+		$this->clearPID();
+		*/
 
 		return 0;
 	}
@@ -116,6 +129,7 @@ class PreGenerate extends Command {
 			$qb = $this->connection->getQueryBuilder();
 			$row = $qb->select('*')
 				->from('preview_generation')
+				->orderBy('id')
 				->where($qb->expr()->eq('locked', $qb->createNamedParameter(false)))
 				->setMaxResults(1)
 				->execute()
@@ -129,11 +143,11 @@ class PreGenerate extends Command {
 			   ->where($qb->expr()->eq('id', $qb->createNamedParameter($row['id'])))
 			   ->set('locked', $qb->createNamedParameter(true))
 			   ->execute();
-                        try {
+			try {
 				$this->processRow($row);
 			} finally {
 				$qb->delete('preview_generation')
-			            ->where($qb->expr()->eq('id', $qb->createNamedParameter($row['id'])))
+					->where($qb->expr()->eq('id', $qb->createNamedParameter($row['id'])))
 				    ->execute();
 			}
 		}
