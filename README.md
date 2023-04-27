@@ -61,6 +61,10 @@ does not time out.
 Yes this happens when the `pre-generate` command crashes. No worries the lock
 will be released after 30 minutes of inactivity from the app. So go grab a cookie.
 
+### What if I'm using Nextcloud All In One?
+
+Follow [these instructions](https://github.com/nextcloud/all-in-one/discussions/542)
+
 ### I don't want to generate all the preview sizes
 
 This is possible since version 1.0.8. Just set the correct values via the command line
