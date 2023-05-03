@@ -232,7 +232,7 @@ class PreGenerate extends Command {
 			return false;
 		}
 
-		// Get get the gid of non running processes so continue
+		// Get the gid of non running processes so continue
 		if (posix_getpgid($pid) === false) {
 			return false;
 		}
