@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.3.0 - 2023-05-17
+### Added
+- Add instructions for use with AIO to readme (thanks to @JL102)
+- Support for Nextcloud 27
+### Removed
+- Support for Nextcloud 24 (EOL)
+
 ## 5.2.4 - 2023-04-20
 ### Fixed
 - Harden error handling of deleted files check
