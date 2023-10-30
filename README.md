@@ -70,7 +70,7 @@ Follow [these instructions](https://github.com/nextcloud/all-in-one/discussions/
 This is possible since version 1.0.8. Just set the correct values via the command line
 
 ```
-./occ config:app:set --value="64 256 1024"  previewgenerator squareSizes
+./occ config:app:set --value="64 256 1024" previewgenerator squareSizes
 ./occ config:app:set --value="64 256 1024" previewgenerator widthSizes
 ./occ config:app:set --value="64 256 1024" previewgenerator heightSizes
 ```
