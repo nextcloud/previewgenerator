@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.5.0 - 2024-03-30
+### Added
+- Support for Nextcloud 29
+
 ## 5.4.0 - 2023-11-27
 ### Added
 - Support for Nextcloud 28
