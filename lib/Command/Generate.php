@@ -34,6 +34,7 @@ use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\Files\StorageInvalidException;
 use OCP\Files\StorageNotAvailableException;
 use OCP\IConfig;
 use OCP\IPreview;
@@ -212,10 +213,10 @@ class Generate extends Command {
 					$this->parseFile($node);
 				}
 			}
-		} catch (StorageNotAvailableException $e) {
-			$this->output->writeln(sprintf('<error>Storage for folder folder %s is not available: %s</error>',
+		} catch (StorageNotAvailableException|StorageInvalidException $e) {
+			$this->output->writeln(sprintf('<error>Storage for folder %s is not available: %s</error>',
 				$folder->getPath(),
-				$e->getHint()
+				$e->getMessage(),
 			));
 		}
 	}
