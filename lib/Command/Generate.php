@@ -37,6 +37,7 @@ use OCP\Files\NotFoundException;
 use OCP\Files\StorageInvalidException;
 use OCP\Files\StorageNotAvailableException;
 use OCP\IConfig;
+use OCP\IDBConnection;
 use OCP\IPreview;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -49,19 +50,38 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command {
+
+	/** @var ?GlobalStoragesService */
 	protected ?GlobalStoragesService $globalService;
+
+	/** @var array */
 	protected array $specifications;
+	/** @var IUserManager */
 	protected IUserManager $userManager;
+
+	/** @var IRootFolder */
 	protected IRootFolder $rootFolder;
+
+	/** @var IPreview */
 	protected IPreview $previewGenerator;
+
+	/** @var IConfig */
 	protected IConfig $config;
+
+	/** @var IDBConnection */
+	protected $connection;
+
+	/** @var OutputInterface */
 	protected OutputInterface $output;
+
+	/** @var IManager */
 	protected IManager $encryptionManager;
 
 	public function __construct(IRootFolder $rootFolder,
 		IUserManager $userManager,
 		IPreview $previewGenerator,
 		IConfig $config,
+		IDBConnection $connection,
 		IManager $encryptionManager,
 		ContainerInterface $container) {
 		parent::__construct();
@@ -70,6 +90,7 @@ class Generate extends Command {
 		$this->rootFolder = $rootFolder;
 		$this->previewGenerator = $previewGenerator;
 		$this->config = $config;
+		$this->connection = $connection;
 		$this->encryptionManager = $encryptionManager;
 
 		try {
@@ -179,7 +200,7 @@ class Generate extends Command {
 		}
 		$pathFolder = $userFolder->get($relativePath);
 		$noPreviewMountPaths = $this->getNoPreviewMountPaths($user);
-		$this->parseFolder($pathFolder, $noPreviewMountPaths);
+		$this->parseFolder($pathFolder, $noPreviewMountPaths, $user);
 	}
 
 	private function generateUserPreviews(IUser $user): void {
@@ -188,10 +209,10 @@ class Generate extends Command {
 
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 		$noPreviewMountPaths = $this->getNoPreviewMountPaths($user);
-		$this->parseFolder($userFolder, $noPreviewMountPaths);
+		$this->parseFolder($userFolder, $noPreviewMountPaths, $user);
 	}
 
-	private function parseFolder(Folder $folder, array $noPreviewMountPaths): void {
+	private function parseFolder(Folder $folder, array $noPreviewMountPaths, IUser $user): void {
 		try {
 			$folderPath = $folder->getPath();
 
@@ -209,8 +230,44 @@ class Generate extends Command {
 			foreach ($nodes as $node) {
 				if ($node instanceof Folder) {
 					$this->parseFolder($node, $noPreviewMountPaths);
-				} elseif ($node instanceof File) {
-					$this->parseFile($node);
+				} else if ($node instanceof File) {
+					$is_locked = false;
+					$qb = $this->connection->getQueryBuilder();
+					$row = $qb->select('*')
+						->from('preview_generation')
+						->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
+						->setMaxResults(1)
+						->execute()
+						->fetch();
+					if ($row !== false) {
+						if ($row['locked'] == 1) {
+							// already being processed
+							$is_locked = true;
+						} else {
+							$qb->update('preview_generation')
+								->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
+								->set('locked', $qb->createNamedParameter(true))
+								->execute();
+						}
+					} else {
+						$qb->insert('preview_generation')
+							->values([
+								'uid'     => $qb->createNamedParameter($user->getUID()),
+								'file_id' => $qb->createNamedParameter($node->getId()),
+								'locked'  => $qb->createNamedParameter(true),
+							])
+							->execute();
+					}
+
+					if ($is_locked === false) {
+						try {
+							$this->parseFile($node);
+						} finally {
+							$qb->delete('preview_generation')
+								->where($qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId())))
+								->execute();
+						}
+					}
 				}
 			}
 		} catch (StorageNotAvailableException|StorageInvalidException $e) {
