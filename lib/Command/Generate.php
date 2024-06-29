@@ -32,6 +32,7 @@ use OCA\PreviewGenerator\SizeHelper;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
 use OCP\Files\Folder;
+use OCP\Files\GenericFileException;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\StorageInvalidException;
@@ -231,9 +232,10 @@ class Generate extends Command {
 				$this->previewGenerator->generatePreviews($file, $this->specifications);
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
-			} catch (\InvalidArgumentException $e) {
+			} catch (\InvalidArgumentException | GenericFileException $e) {
+				$class = $e::class;
 				$error = $e->getMessage();
-				$this->output->writeln("<error>{$error}</error>");
+				$this->output->writeln("<error>{$class}: {$error}</error>");
 			}
 		}
 	}
