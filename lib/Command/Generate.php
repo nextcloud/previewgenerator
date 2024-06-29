@@ -34,6 +34,7 @@ use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\Files\GenericFileException;
 use OCP\Files\StorageInvalidException;
 use OCP\Files\StorageNotAvailableException;
 use OCP\IConfig;
@@ -234,6 +235,8 @@ class Generate extends Command {
 			} catch (\InvalidArgumentException $e) {
 				$error = $e->getMessage();
 				$this->output->writeln("<error>{$error}</error>");
+			} catch (GenericFileException $e) {
+				$this->output->writeln("<error>GenericFileException</error>");
 			}
 		}
 	}
