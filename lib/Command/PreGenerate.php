@@ -31,6 +31,7 @@ use OCA\PreviewGenerator\SizeHelper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
+use OCP\Files\GenericFileException;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IConfig;
@@ -205,9 +206,10 @@ class PreGenerate extends Command {
 				$this->previewGenerator->generatePreviews($file, $specifications);
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
-			} catch (\InvalidArgumentException $e) {
+			} catch (\InvalidArgumentException | GenericFileException $e) {
+				$class = $e::class;
 				$error = $e->getMessage();
-				$this->output->writeln("<error>{$error}</error>");
+				$this->output->writeln("<error>{$class}: {$error}</error>");
 			}
 		}
 	}
