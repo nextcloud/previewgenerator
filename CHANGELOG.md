@@ -1,5 +1,16 @@
 # Changelog
 
+## 5.6.0 - 2024-07-29
+### Added
+- Support for Nextcloud 30
+
+### Changed
+- Catch GenericFileException during preview generation (thanks to @nielstron)
+
+### Removed
+- Support for Nextcloud 26 (EOL)
+- Support for Nextcloud 27 (EOL)
+
 ## 5.5.0 - 2024-03-30
 ### Added
 - Support for Nextcloud 29
