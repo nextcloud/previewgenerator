@@ -83,7 +83,7 @@ class Generate extends Command {
 	protected function configure(): void {
 		$this
 			->setName('preview:generate-all')
-			->setDescription('Generate previews')
+			->setDescription('Generate previews for all images')
 			->addArgument(
 				'user_id',
 				InputArgument::OPTIONAL | InputArgument::IS_ARRAY,

@@ -89,7 +89,7 @@ class PreGenerate extends Command {
 	protected function configure(): void {
 		$this
 			->setName('preview:pre-generate')
-			->setDescription('Pre generate previews');
+			->setDescription('Pre generate only images that have been added or changed since the last regular run');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
