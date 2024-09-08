@@ -6,6 +6,14 @@ start preview generation. This means that you can better utilize your
 system by pre-generating previews when your system is normally idle and thus 
 putting less load on your machine when the requests are actually served.
 
+This app is primarily meant for small Nextcloud servers running on cheap
+hardware where on-demand generation of previews is not quick enough. The app
+effectively trades higher disk usage for quicker previews and this trade-off
+should be considered carefully. The previous reasoning of resource exhaustion
+caused by too many concurrent preview requests is not a concern anymore as
+there is a [configurable limit](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#preview-concurrency-all)
+in modern versions of Nextcloud.
+
 The app does not replace on demand preview generation so if a preview is 
 requested before it is pre-generated it will still be shown.
 
