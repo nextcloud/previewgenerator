@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace OCA\PreviewGenerator\Command;
 
+use OCA\PreviewGenerator\Service\NoMediaService;
 use OCA\PreviewGenerator\SizeHelper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Encryption\IManager;
@@ -55,6 +56,7 @@ class PreGenerate extends Command {
 	protected OutputInterface $output;
 	protected IManager $encryptionManager;
 	protected ITimeFactory $time;
+	protected NoMediaService $noMediaService;
 
 	/**
 	 * @param string $appName
@@ -73,7 +75,8 @@ class PreGenerate extends Command {
 		IConfig $config,
 		IDBConnection $connection,
 		IManager $encryptionManager,
-		ITimeFactory $time) {
+		ITimeFactory $time,
+		NoMediaService $noMediaService) {
 		parent::__construct();
 
 		$this->appName = $appName;
@@ -84,6 +87,7 @@ class PreGenerate extends Command {
 		$this->connection = $connection;
 		$this->encryptionManager = $encryptionManager;
 		$this->time = $time;
+		$this->noMediaService = $noMediaService;
 	}
 
 	protected function configure(): void {
@@ -183,6 +187,10 @@ class PreGenerate extends Command {
 		$absPath = ltrim($file->getPath(), '/');
 		$pathComponents = explode('/', $absPath);
 		if (isset($pathComponents[1]) && $pathComponents[1] === 'files_trashbin') {
+			return;
+		}
+
+		if ($this->noMediaService->hasNoMediaFile($file)) {
 			return;
 		}
 
