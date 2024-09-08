@@ -1,0 +1,7 @@
+# .git-blame-ignore-revs
+
+# SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Update to coding-standard 1.2.3
+a4b904e3a46b2fb50970f3b145c4ed1d6f37b988
