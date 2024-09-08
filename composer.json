@@ -10,9 +10,11 @@
 	"scripts": {
 		"cs:fix": "php-cs-fixer fix",
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
-		"lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l"
+		"lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+		"test:unit": "phpunit -c tests/phpunit.xml tests"
 	},
 	"require-dev": {
-		"nextcloud/coding-standard": "^1.0.0"
+		"nextcloud/coding-standard": "^1.0.0",
+		"phpunit/phpunit": "^9.6.20"
 	}
 }
