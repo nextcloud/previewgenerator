@@ -232,7 +232,7 @@ class Generate extends Command {
 				$this->previewGenerator->generatePreviews($file, $this->specifications);
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
-			} catch (\InvalidArgumentException | GenericFileException $e) {
+			} catch (\InvalidArgumentException|GenericFileException $e) {
 				$class = $e::class;
 				$error = $e->getMessage();
 				$this->output->writeln("<error>{$class}: {$error}</error>");
