@@ -162,7 +162,7 @@ class Generate extends Command {
 				$mount->getMountOptions()['previews'] === false
 			) {
 				$userFolder = $this->rootFolder->getUserFolder($userId)->getPath();
-				array_push($mountPaths, $userFolder.$mount->getMountPoint());
+				array_push($mountPaths, $userFolder . $mount->getMountPoint());
 			}
 		}
 		return $mountPaths;
