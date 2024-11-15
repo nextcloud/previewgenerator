@@ -44,8 +44,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PreGenerate extends Command {
-	/** @var int[][] */
-	protected array $sizes;
+	/* @return array{width: int, height: int, crop: bool} */
+	protected array $specifications;
 
 	protected string $appName;
 	protected IUserManager $userManager;
@@ -57,6 +57,7 @@ class PreGenerate extends Command {
 	protected IManager $encryptionManager;
 	protected ITimeFactory $time;
 	protected NoMediaService $noMediaService;
+	protected SizeHelper $sizeHelper;
 
 	/**
 	 * @param string $appName
@@ -76,7 +77,8 @@ class PreGenerate extends Command {
 		IDBConnection $connection,
 		IManager $encryptionManager,
 		ITimeFactory $time,
-		NoMediaService $noMediaService) {
+		NoMediaService $noMediaService,
+		SizeHelper $sizeHelper) {
 		parent::__construct();
 
 		$this->appName = $appName;
@@ -88,6 +90,7 @@ class PreGenerate extends Command {
 		$this->encryptionManager = $encryptionManager;
 		$this->time = $time;
 		$this->noMediaService = $noMediaService;
+		$this->sizeHelper = $sizeHelper;
 	}
 
 	protected function configure(): void {
@@ -114,7 +117,10 @@ class PreGenerate extends Command {
 		$output->setFormatter($formatter);
 		$this->output = $output;
 
-		$this->sizes = SizeHelper::calculateSizes($this->config);
+		$this->specifications = $this->sizeHelper->generateSpecifications();
+		if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERY_VERBOSE) {
+			$output->writeln('Specifications: ' . json_encode($this->specifications));
+		}
 		$this->startProcessing();
 
 		$this->clearPID();
@@ -200,18 +206,7 @@ class PreGenerate extends Command {
 			}
 
 			try {
-				$specifications = array_merge(
-					array_map(static function ($squareSize) {
-						return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
-					}, $this->sizes['square']),
-					array_map(static function ($heightSize) {
-						return ['width' => -1, 'height' => $heightSize, 'crop' => false];
-					}, $this->sizes['height']),
-					array_map(static function ($widthSize) {
-						return ['width' => $widthSize, 'height' => -1, 'crop' => false];
-					}, $this->sizes['width'])
-				);
-				$this->previewGenerator->generatePreviews($file, $specifications);
+				$this->previewGenerator->generatePreviews($file, $this->specifications);
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
 			} catch (\InvalidArgumentException|GenericFileException $e) {

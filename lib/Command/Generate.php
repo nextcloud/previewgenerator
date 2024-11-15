@@ -50,21 +50,25 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command {
-	protected ?GlobalStoragesService $globalService;
+	/* @return array{width: int, height: int, crop: bool} */
 	protected array $specifications;
+
+	protected ?GlobalStoragesService $globalService;
 	protected IUserManager $userManager;
 	protected IRootFolder $rootFolder;
 	protected IPreview $previewGenerator;
 	protected IConfig $config;
 	protected OutputInterface $output;
 	protected IManager $encryptionManager;
+	protected SizeHelper $sizeHelper;
 
 	public function __construct(IRootFolder $rootFolder,
 		IUserManager $userManager,
 		IPreview $previewGenerator,
 		IConfig $config,
 		IManager $encryptionManager,
-		ContainerInterface $container) {
+		ContainerInterface $container,
+		SizeHelper $sizeHelper) {
 		parent::__construct();
 
 		$this->userManager = $userManager;
@@ -72,6 +76,7 @@ class Generate extends Command {
 		$this->previewGenerator = $previewGenerator;
 		$this->config = $config;
 		$this->encryptionManager = $encryptionManager;
+		$this->sizeHelper = $sizeHelper;
 
 		try {
 			$this->globalService = $container->get(GlobalStoragesService::class);
@@ -107,19 +112,10 @@ class Generate extends Command {
 		$output->setFormatter($formatter);
 		$this->output = $output;
 
-		// Generate preview specifications once
-		$sizes = SizeHelper::calculateSizes($this->config);
-		$this->specifications = array_merge(
-			array_map(static function ($squareSize) {
-				return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
-			}, $sizes['square']),
-			array_map(static function ($heightSize) {
-				return ['width' => -1, 'height' => $heightSize, 'crop' => false];
-			}, $sizes['height']),
-			array_map(static function ($widthSize) {
-				return ['width' => $widthSize, 'height' => -1, 'crop' => false];
-			}, $sizes['width'])
-		);
+		$this->specifications = $this->sizeHelper->generateSpecifications();
+		if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERY_VERBOSE) {
+			$output->writeln('Specifications: ' . json_encode($this->specifications));
+		}
 
 		$inputPaths = $input->getOption('path');
 		if ($inputPaths) {
@@ -162,7 +158,7 @@ class Generate extends Command {
 				$mount->getMountOptions()['previews'] === false
 			) {
 				$userFolder = $this->rootFolder->getUserFolder($userId)->getPath();
-				array_push($mountPaths, $userFolder.$mount->getMountPoint());
+				array_push($mountPaths, $userFolder . $mount->getMountPoint());
 			}
 		}
 		return $mountPaths;
