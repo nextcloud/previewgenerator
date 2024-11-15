@@ -1,5 +1,16 @@
 # Changelog
 
+## 5.7.0 - 2024-11-15
+### Added
+- Implement square and uncropped sizes config
+- Clear distinction between generate-all and pre-generate
+
+### Fixed
+- Skip .nomedia when running pre-generate
+
+### Changed
+- Improve readme, add a new paragraph and update preview recommendations
+
 ## 5.6.0 - 2024-07-29
 ### Added
 - Support for Nextcloud 30
