@@ -27,30 +27,37 @@ declare(strict_types=1);
 
 namespace OCA\PreviewGenerator;
 
+use OCA\PreviewGenerator\AppInfo\Application;
 use OCP\IConfig;
 
 class SizeHelper {
+	public function __construct(
+		private IConfig $config,
+	) {
+	}
+
 	/**
-	 * @param IConfig $config
-	 * @return int[][]
+	 * @return array{width: int, height: int, crop: bool}
 	 */
-	public static function calculateSizes(IConfig $config): array {
+	public function generateSpecifications(): array {
 		/*
 		 * First calculate the systems max sizes
 		 */
 
 		$sizes = [
 			'square' => [],
+			'squareUncropped' => [],
 			'height' => [],
 			'width' => [],
 		];
 
-		$maxW = (int)$config->getSystemValue('preview_max_x', 4096);
-		$maxH = (int)$config->getSystemValue('preview_max_y', 4096);
+		$maxW = (int)$this->config->getSystemValue('preview_max_x', 4096);
+		$maxH = (int)$this->config->getSystemValue('preview_max_y', 4096);
 
 		$s = 64;
 		while ($s <= $maxW || $s <= $maxH) {
 			$sizes['square'][] = $s;
+			$sizes['squareUncropped'][] = $s;
 			$s *= 4;
 		}
 
@@ -72,35 +79,71 @@ class SizeHelper {
 		 * stuff it is their own fault and we just ignore it
 		 */
 		$getCustomSizes = function (IConfig $config, $key) {
-			$TXT = $config->getAppValue('previewgenerator', $key, '');
+			$raw = $config->getAppValue(Application::APP_ID, $key, null);
+			if ($raw === null) {
+				return null;
+			}
+
+			// User wants to skip those sizes deliberately
+			if ($raw === '') {
+				return [];
+			}
+
 			$values = [];
-			if ($TXT !== '') {
-				foreach (explode(' ', $TXT) as $value) {
-					if (ctype_digit($value)) {
-						$values[] = (int)$value;
-					}
+			foreach (explode(' ', $raw) as $value) {
+				if (ctype_digit($value)) {
+					$values[] = (int)$value;
 				}
 			}
 
 			return $values;
 		};
 
-		$squares = $getCustomSizes($config, 'squareSizes');
-		$widths = $getCustomSizes($config, 'widthSizes');
-		$heights = $getCustomSizes($config, 'heightSizes');
+		$squares = $getCustomSizes($this->config, 'squareSizes');
+		$squaresUncropped = $getCustomSizes($this->config, 'squareUncroppedSizes');
+		$widths = $getCustomSizes($this->config, 'widthSizes');
+		$heights = $getCustomSizes($this->config, 'heightSizes');
 
-		if ($squares !== []) {
+		if ($squares !== null) {
 			$sizes['square'] = array_intersect($sizes['square'], $squares);
 		}
 
-		if ($widths !== []) {
+		if ($squaresUncropped !== null) {
+			$sizes['squareUncropped'] = array_intersect(
+				$sizes['squareUncropped'],
+				$squaresUncropped,
+			);
+		}
+
+		if ($widths !== null) {
 			$sizes['width'] = array_intersect($sizes['width'], $widths);
 		}
 
-		if ($heights !== []) {
+		if ($heights !== null) {
 			$sizes['height'] = array_intersect($sizes['height'], $heights);
 		}
 
-		return $sizes;
+		return $this->mergeSpecifications($sizes);
+	}
+
+	/**
+	 * @param int[][] $sizes
+	 * @return array{width: int, height: int, crop: bool}
+	 */
+	private function mergeSpecifications(array $sizes): array {
+		return array_merge(
+			array_map(static function ($squareSize) {
+				return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
+			}, $sizes['square']),
+			array_map(static function ($squareSize) {
+				return ['width' => $squareSize, 'height' => $squareSize, 'crop' => false];
+			}, $sizes['squareUncropped']),
+			array_map(static function ($heightSize) {
+				return ['width' => -1, 'height' => $heightSize, 'crop' => false];
+			}, $sizes['height']),
+			array_map(static function ($widthSize) {
+				return ['width' => $widthSize, 'height' => -1, 'crop' => false];
+			}, $sizes['width'])
+		);
 	}
 }
