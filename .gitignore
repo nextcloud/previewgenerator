@@ -1,3 +1,4 @@
 /vendor
 /.php-cs-fixer.cache
 /tests/.phpunit.result.cache
+/build
