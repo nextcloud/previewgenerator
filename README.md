@@ -45,17 +45,45 @@ are running on the time this takes can vary.
 
 ## Commands
 
-### preview:generate-all [--path=PATH ...] [user_id ...]
+#### `preview:generate-all [--path=PATH ...] [user_id ...]`
 
 Loop over all files and try to generate previews for them. If one or multiple user ids are supplied
 it will just loop over the files of those users. You can also limit the generation to one or more
-paths using `--path="/[username]/files/[folder path]"`, e.g. `--path="/alice/files/Photos"`. Note that
-all given user_ids are ignored if at least one path is specified.
+paths using `--path="/[username]/files/[folder path]"`, e.g. `--path="/alice/files/Photos"`. Note
+that all given user_ids are ignored if at least one path is specified.
 
-### preview:pre-generate
+#### `preview:pre-generate`
 
-Do the actual pregeneration. This means only for new or modified files (since
-the app was enabled or the last pregeneration was done).
+Do the actual pre-generation. This means only for new or modified files (since the app was enabled
+or the last pre-generation was done).
+
+Use `<command> -vv` to get a more verbose output if you are interested to see which files are being
+processed.
+
+## Available configuration options
+
+The value of each option can either be a list of sizes separated by **spaces** or an empty string.
+Setting an empty string will simply skip those kinds of previews.
+Deleting or not setting a config will use a built-in default list of values for those previews.
+
+* Preview sizes must be a power of 4! Other sizes are silently ignored.
+* The smallest possible size is 64.
+* The max size is determined by your `preview_max_x` and `preview_max_y` settings in `config.php`.
+
+#### `occ config:app:set --value="64 256" previewgenerator squareSizes`
+Cropped square previews which are mostly used in the list and tile views of the files app.
+
+#### `occ config:app:set --value="256 4096" previewgenerator squareUncroppedSizes`
+Will retain the aspect ratio and try to maximize **either** width **or** height.
+
+#### `occ config:app:set --value="64 256 1024" previewgenerator widthSizes`
+Will retain the aspect ratio and use the specified width. The height will be scaled according to
+the aspect ratio.
+
+#### `occ config:app:set --value="64 256 1024" previewgenerator heightSizes`
+Will retain the aspect ratio and use the specified height. The width will be scaled according to
+the aspect ratio.
+
 
 ## FAQ
 
@@ -75,28 +103,25 @@ Follow [these instructions](https://github.com/nextcloud/all-in-one/discussions/
 
 ### I don't want to generate all the preview sizes
 
-This is possible since version 1.0.8. Just set the correct values via the command line
+The following options are recommended if you only want to generate a minimum set of required
+previews.
+This should include all previews requested by the files, photos and activity apps.
 
 ```
-./occ config:app:set --value="64 256 1024" previewgenerator squareSizes
-./occ config:app:set --value="64 256 1024" previewgenerator widthSizes
-./occ config:app:set --value="64 256 1024" previewgenerator heightSizes
+./occ config:app:set --value="64 256" previewgenerator squareSizes
+./occ config:app:set --value="256 4096" previewgenerator squareUncroppedSizes
+./occ config:app:set --value="" previewgenerator widthSizes
+./occ config:app:set --value="" previewgenerator heightSizes
 ```
 
 This will only generate:
- * square previews of: 64x64, 256x256 and 1024x1024
- * aspect ratio previews with a width of: 64, 256 and 1024
- * aspect ratio previews with a height of: 64, 256 and 1024
+* Cropped square previews of: 64x64 and 256x256
+* Aspect ratio previews with a max width **or** max height of: 256 and 4096
 
-Note:
- * preview sizes are always a power of 4.
- * The smallest size is 64
- * The max size is determined by your preview settings in config.php
- 
- ### I get  "PHP Fatal error:  Allowed memory size of X bytes exhausted"
- You need to increase the memory allowance of PHP, by default it is 128 MB. You do that by changing the memory_limit in the php.ini file.
- 
- If you use [the docker container](https://github.com/nextcloud/docker) you need set the environment variable `PHP_MEMORY_LIMIT` instead.
+### I get  "PHP Fatal error:  Allowed memory size of X bytes exhausted"
+You need to increase the memory allowance of PHP, by default it is 128 MB. You do that by changing the memory_limit in the php.ini file.
+
+If you use [the docker container](https://github.com/nextcloud/docker) you need set the environment variable `PHP_MEMORY_LIMIT` instead.
 
 ### I want to skip a folder and everything in/under it
 
