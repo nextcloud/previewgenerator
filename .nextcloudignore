@@ -4,6 +4,7 @@
 .git
 .github
 .gitignore
+.git-blame-ignore-revs
 .nextcloudignore
 .scrutinizer.yml
 .travis.yml
