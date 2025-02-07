@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.8.0 - 2025-02-07
+### Added
+- Support for Nextcloud 31
+- Support for PHP 8.4
+
 ## 5.7.0 - 2024-11-15
 ### Added
 - Implement square and uncropped sizes config
