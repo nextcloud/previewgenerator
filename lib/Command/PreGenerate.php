@@ -94,7 +94,7 @@ class PreGenerate extends Command {
 	protected function configure(): void {
 		$this
 			->setName('preview:pre-generate')
-			->setDescription('Pre generate previews');
+			->setDescription('Pre generate only images that have been added or changed since the last regular run');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
@@ -102,15 +102,6 @@ class PreGenerate extends Command {
 			$output->writeln('Encryption is enabled. Aborted.');
 			return 1;
 		}
-		/*
-		this locks it to only be run once
-		if ($this->checkAlreadyRunning()) {
-			$output->writeln('Command is already running.');
-			return 2;
-		}
-
-		$this->setPID();
-		*/
 
 		// Set timestamp output
 		$formatter = new TimestampFormatter($this->config, $output->getFormatter());
@@ -122,10 +113,6 @@ class PreGenerate extends Command {
 			$output->writeln('Specifications: ' . json_encode($this->specifications));
 		}
 		$this->startProcessing();
-
-		/*
-		$this->clearPID();
-		*/
 
 		return 0;
 	}
