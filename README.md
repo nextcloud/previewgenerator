@@ -1,4 +1,10 @@
+<!--
+  - SPDX-FileCopyrightText: 2017 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 # Preview Generator
+
+[![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/previewgenerator)](https://api.reuse.software/info/github.com/nextcloud/previewgenerator)
 
 Nextcloud app that allows admins to pre-generate previews. The app listens to 
 edit events and stores this information. Once a cron job is triggered it will
