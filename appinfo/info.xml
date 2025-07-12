@@ -28,7 +28,7 @@ The first time you install this app, before using a cron job, you properly want 
 	<repository type="git">https://github.com/nextcloud/previewgenerator.git</repository>
 	<dependencies>
 		<php min-version="8.0" max-version="8.4" />
-		<nextcloud min-version="28" max-version="32" />
+		<nextcloud min-version="28" max-version="31" />
 	</dependencies>
 
 	<commands>
