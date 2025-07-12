@@ -79,8 +79,11 @@ Deleting or not setting a config will use a built-in default list of values for 
 #### `occ config:app:set --value="64 256" previewgenerator squareSizes`
 Cropped square previews which are mostly used in the list and tile views of the files app.
 
-#### `occ config:app:set --value="256 4096" previewgenerator squareUncroppedSizes`
-Will retain the aspect ratio and try to maximize **either** width **or** height.
+#### `occ config:app:set --value="256 4096" previewgenerator fillWidthHeightSizes`
+Will retain the aspect ratio and try to use the given size for the longer edge.
+
+#### `occ config:app:set --value="256 4096" previewgenerator coverWidthHeightSizes`
+Will retain the aspect ratio and try to use the given size for the shorter edge.
 
 #### `occ config:app:set --value="64 256 1024" previewgenerator widthSizes`
 Will retain the aspect ratio and use the specified width. The height will be scaled according to
@@ -115,7 +118,7 @@ This should include all previews requested by the files, photos and activity app
 
 ```
 ./occ config:app:set --value="64 256" previewgenerator squareSizes
-./occ config:app:set --value="256 4096" previewgenerator squareUncroppedSizes
+./occ config:app:set --value="256 4096" previewgenerator fillWidthHeightSizes
 ./occ config:app:set --value="" previewgenerator widthSizes
 ./occ config:app:set --value="" previewgenerator heightSizes
 ```
@@ -123,6 +126,14 @@ This should include all previews requested by the files, photos and activity app
 This will only generate:
 * Cropped square previews of: 64x64 and 256x256
 * Aspect ratio previews with a max width **or** max height of: 256 and 4096
+
+### I'm using the Memories app
+
+You can generate an additional preview for the timeline view of the Memories app.
+
+```
+./occ config:app:set --value="256" previewgenerator coverWidthHeightSizes
+```
 
 ### I get  "PHP Fatal error:  Allowed memory size of X bytes exhausted"
 You need to increase the memory allowance of PHP, by default it is 128 MB. You do that by changing the memory_limit in the php.ini file.
