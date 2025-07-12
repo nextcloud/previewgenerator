@@ -11,6 +11,7 @@ namespace OCA\PreviewGenerator;
 
 use OCA\PreviewGenerator\AppInfo\Application;
 use OCP\IConfig;
+use OCP\IPreview;
 
 class SizeHelper {
 	public function __construct(
@@ -28,7 +29,8 @@ class SizeHelper {
 
 		$sizes = [
 			'square' => [],
-			'squareUncropped' => [],
+			'fillWidthHeight' => [],
+			'coverWidthHeight' => [],
 			'height' => [],
 			'width' => [],
 		];
@@ -39,7 +41,7 @@ class SizeHelper {
 		$s = 64;
 		while ($s <= $maxW || $s <= $maxH) {
 			$sizes['square'][] = $s;
-			$sizes['squareUncropped'][] = $s;
+			$sizes['fillWidthHeight'][] = $s;
 			$s *= 4;
 		}
 
@@ -60,8 +62,8 @@ class SizeHelper {
 		 * Note that only powers of 4 matter but if users supply different
 		 * stuff it is their own fault and we just ignore it
 		 */
-		$getCustomSizes = function (IConfig $config, $key) {
-			$raw = $config->getAppValue(Application::APP_ID, $key, null);
+		$getCustomSizes = function ($key) {
+			$raw = $this->config->getAppValue(Application::APP_ID, $key, null);
 			if ($raw === null) {
 				return null;
 			}
@@ -81,19 +83,28 @@ class SizeHelper {
 			return $values;
 		};
 
-		$squares = $getCustomSizes($this->config, 'squareSizes');
-		$squaresUncropped = $getCustomSizes($this->config, 'squareUncroppedSizes');
-		$widths = $getCustomSizes($this->config, 'widthSizes');
-		$heights = $getCustomSizes($this->config, 'heightSizes');
+		$squares = $getCustomSizes('squareSizes');
+		$fillWidthHeight = $getCustomSizes('fillWidthHeightSizes')
+			?? $getCustomSizes('squareUncroppedSizes');
+		$coverWidthHeight = $getCustomSizes('coverWidthHeightSizes');
+		$widths = $getCustomSizes('widthSizes');
+		$heights = $getCustomSizes('heightSizes');
 
 		if ($squares !== null) {
 			$sizes['square'] = array_intersect($sizes['square'], $squares);
 		}
 
-		if ($squaresUncropped !== null) {
-			$sizes['squareUncropped'] = array_intersect(
-				$sizes['squareUncropped'],
-				$squaresUncropped,
+		if ($fillWidthHeight !== null) {
+			$sizes['fillWidthHeight'] = array_intersect(
+				$sizes['fillWidthHeight'],
+				$fillWidthHeight,
+			);
+		}
+
+		if ($coverWidthHeight !== null) {
+			$sizes['coverWidthHeight'] = array_filter(
+				$coverWidthHeight,
+				static fn ($size) => $size <= $maxW && $size <= $maxH && self::isPowerOfTwo($size),
 			);
 		}
 
@@ -117,9 +128,22 @@ class SizeHelper {
 			array_map(static function ($squareSize) {
 				return ['width' => $squareSize, 'height' => $squareSize, 'crop' => true];
 			}, $sizes['square']),
-			array_map(static function ($squareSize) {
-				return ['width' => $squareSize, 'height' => $squareSize, 'crop' => false];
-			}, $sizes['squareUncropped']),
+			array_map(static function ($size) {
+				return [
+					'width' => $size,
+					'height' => $size,
+					'crop' => false,
+					'mode' => IPreview::MODE_COVER,
+				];
+			}, $sizes['coverWidthHeight']),
+			array_map(static function ($size) {
+				return [
+					'width' => $size,
+					'height' => $size,
+					'crop' => false,
+					'mode' => IPreview::MODE_FILL,
+				];
+			}, $sizes['fillWidthHeight']),
 			array_map(static function ($heightSize) {
 				return ['width' => -1, 'height' => $heightSize, 'crop' => false];
 			}, $sizes['height']),
@@ -127,5 +151,9 @@ class SizeHelper {
 				return ['width' => $widthSize, 'height' => -1, 'crop' => false];
 			}, $sizes['width'])
 		);
+	}
+
+	private static function isPowerOfTwo(int $n): bool {
+		return ($n & ($n - 1)) === 0;
 	}
 }
