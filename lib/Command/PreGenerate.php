@@ -38,8 +38,6 @@ class PreGenerate extends Command {
 	protected OutputInterface $output;
 	protected IManager $encryptionManager;
 	protected ITimeFactory $time;
-	protected NoMediaService $noMediaService;
-	protected SizeHelper $sizeHelper;
 
 	/**
 	 * @param string $appName
@@ -87,13 +85,6 @@ class PreGenerate extends Command {
 			return 1;
 		}
 
-		if ($this->checkAlreadyRunning()) {
-			$output->writeln('Command is already running.');
-			return 2;
-		}
-
-		$this->setPID();
-
 		// Set timestamp output
 		$formatter = new TimestampFormatter($this->config, $output->getFormatter());
 		$output->setFormatter($formatter);
@@ -105,37 +96,37 @@ class PreGenerate extends Command {
 		}
 		$this->startProcessing();
 
-		$this->clearPID();
-
 		return 0;
 	}
 
 	private function startProcessing(): void {
+		// random sleep between 0 and 50ms to avoid collision between 2 processes
+		usleep(rand(0,50000));
+
 		while (true) {
 			$qb = $this->connection->getQueryBuilder();
-			$qb->select('*')
+			$row = $qb->select('*')
 				->from('preview_generation')
 				->orderBy('id')
-				->setMaxResults(1000);
-			$cursor = $qb->execute();
-			$rows = $cursor->fetchAll();
-			$cursor->closeCursor();
+				->where($qb->expr()->eq('locked', $qb->createNamedParameter(false)))
+				->setMaxResults(1)
+				->execute()
+				->fetch();
 
-			if ($rows === []) {
+			if ($row === false) {
 				break;
 			}
 
-			foreach ($rows as $row) {
-				/*
-				 * First delete the row so that if preview generation fails for some reason
-				 * the next run can just continue
-				 */
-				$qb = $this->connection->getQueryBuilder();
-				$qb->delete('preview_generation')
-					->where($qb->expr()->eq('id', $qb->createNamedParameter($row['id'])));
-				$qb->execute();
-
+			$qb->update('preview_generation')
+			   ->where($qb->expr()->eq('id', $qb->createNamedParameter($row['id'])))
+			   ->set('locked', $qb->createNamedParameter(true))
+			   ->execute();
+			try {
 				$this->processRow($row);
+			} finally {
+				$qb->delete('preview_generation')
+					->where($qb->expr()->eq('id', $qb->createNamedParameter($row['id'])))
+				    ->execute();
 			}
 		}
 	}
@@ -191,6 +182,10 @@ class PreGenerate extends Command {
 				$this->previewGenerator->generatePreviews($file, $this->specifications);
 			} catch (NotFoundException $e) {
 				// Maybe log that previews could not be generated?
+				if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
+					$error = $e->getMessage();
+					$this->output->writeln("<error>${error} " . $file->getPath() . " not found.</error>");
+				}
 			} catch (\InvalidArgumentException|GenericFileException $e) {
 				$class = $e::class;
 				$error = $e->getMessage();
