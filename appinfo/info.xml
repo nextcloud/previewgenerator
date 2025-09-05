@@ -15,7 +15,7 @@ The first time you install this app, before using a cron job, you properly want 
 
 **Important**: To enable pre-generation of previews you must add **php /var/www/nextcloud/occ preview:pre-generate** to a system cron job that runs at times of your choosing.]]>
 	</description>
-	<version>5.10.0-alpha.1</version>
+	<version>5.11.0-dev.1</version>
 	<licence>agpl</licence>
 	<author>Richard Steinmetz</author>
 	<namespace>PreviewGenerator</namespace>
