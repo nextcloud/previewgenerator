@@ -4,6 +4,10 @@
 -->
 # Changelog
 
+## 5.10.0 - 2025-09-05
+### Added
+- Support for Nextcloud 32
+
 ## 5.9.0 - 2025-07-12
 ### Added
 - Implement config to use a given size for the shorter edge
