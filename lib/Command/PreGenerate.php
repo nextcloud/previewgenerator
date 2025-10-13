@@ -117,7 +117,7 @@ class PreGenerate extends Command {
 				->from('preview_generation')
 				->orderBy('id')
 				->setMaxResults(1000);
-			$cursor = $qb->execute();
+			$cursor = $qb->executeQuery();
 			$rows = $cursor->fetchAll();
 			$cursor->closeCursor();
 
@@ -133,7 +133,7 @@ class PreGenerate extends Command {
 				$qb = $this->connection->getQueryBuilder();
 				$qb->delete('preview_generation')
 					->where($qb->expr()->eq('id', $qb->createNamedParameter($row['id'])));
-				$qb->execute();
+				$qb->executeStatement();
 
 				$this->processRow($row);
 			}
