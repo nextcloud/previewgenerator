@@ -48,7 +48,7 @@ class PostWriteListener implements IEventListener {
 					$qb->expr()->eq('file_id', $qb->createNamedParameter($node->getId()))
 				)
 			)->setMaxResults(1);
-		$cursor = $qb->execute();
+		$cursor = $qb->executeQuery();
 		$inTable = $cursor->fetch() !== false;
 		$cursor->closeCursor();
 
@@ -61,6 +61,6 @@ class PostWriteListener implements IEventListener {
 		$qb->insert('preview_generation')
 			->setValue('uid', $qb->createNamedParameter($owner))
 			->setValue('file_id', $qb->createNamedParameter($node->getId()));
-		$qb->execute();
+		$qb->executeStatement();
 	}
 }
