@@ -11,6 +11,7 @@ namespace OCA\PreviewGenerator\Command;
 
 use OCA\PreviewGenerator\Service\NoMediaService;
 use OCA\PreviewGenerator\SizeHelper;
+use OCP\AppFramework\Db\TTransactional;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
@@ -26,6 +27,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PreGenerate extends Command {
+	use TTransactional;
+
 	/* @return array{width: int, height: int, crop: bool} */
 	protected array $specifications;
 
@@ -87,13 +90,6 @@ class PreGenerate extends Command {
 			return 1;
 		}
 
-		if ($this->checkAlreadyRunning()) {
-			$output->writeln('Command is already running.');
-			return 2;
-		}
-
-		$this->setPID();
-
 		// Set timestamp output
 		$formatter = new TimestampFormatter($this->config, $output->getFormatter());
 		$output->setFormatter($formatter);
@@ -105,38 +101,44 @@ class PreGenerate extends Command {
 		}
 		$this->startProcessing();
 
-		$this->clearPID();
-
 		return 0;
 	}
 
 	private function startProcessing(): void {
 		while (true) {
-			$qb = $this->connection->getQueryBuilder();
-			$qb->select('*')
-				->from('preview_generation')
-				->orderBy('id')
-				->setMaxResults(1000);
-			$cursor = $qb->executeQuery();
-			$rows = $cursor->fetchAll();
-			$cursor->closeCursor();
+			/*
+			 * Get and delete the row so that if preview generation fails for some reason the next
+			 * run can just continue. Wrap in transaction to make sure that one row is handled by
+			 * one process only.
+			 */
+			$row = $this->atomic(function () {
+				$qb = $this->connection->getQueryBuilder();
+				$qb->select('*')
+					->from('preview_generation')
+					->orderBy('id')
+					->setMaxResults(1);
+				$result = $qb->executeQuery();
+				$row = $result->fetch();
+				$result->closeCursor();
 
-			if ($rows === []) {
-				break;
-			}
+				if (!$row) {
+					return null;
+				}
 
-			foreach ($rows as $row) {
-				/*
-				 * First delete the row so that if preview generation fails for some reason
-				 * the next run can just continue
-				 */
 				$qb = $this->connection->getQueryBuilder();
 				$qb->delete('preview_generation')
 					->where($qb->expr()->eq('id', $qb->createNamedParameter($row['id'])));
 				$qb->executeStatement();
 
-				$this->processRow($row);
+				return $row;
+			}, $this->connection);
+
+
+			if (!$row) {
+				break;
 			}
+
+			$this->processRow($row);
 		}
 	}
 
@@ -197,34 +199,5 @@ class PreGenerate extends Command {
 				$this->output->writeln("<error>{$class}: {$error}</error>");
 			}
 		}
-	}
-
-	private function setPID(): void {
-		$this->config->setAppValue($this->appName, 'pid', posix_getpid());
-	}
-
-	private function clearPID(): void {
-		$this->config->deleteAppValue($this->appName, 'pid');
-	}
-
-	private function getPID(): int {
-		return (int)$this->config->getAppValue($this->appName, 'pid', -1);
-	}
-
-	private function checkAlreadyRunning(): bool {
-		$pid = $this->getPID();
-
-		// No PID set so just continue
-		if ($pid === -1) {
-			return false;
-		}
-
-		// Get the gid of non running processes so continue
-		if (posix_getpgid($pid) === false) {
-			return false;
-		}
-
-		// Seems there is already a running process generating previews
-		return true;
 	}
 }
