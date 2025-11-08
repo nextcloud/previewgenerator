@@ -51,17 +51,25 @@ are running on the time this takes can vary.
 
 ## Commands
 
-#### `preview:generate-all [--path=PATH ...] [user_id ...]`
+#### `preview:generate-all [--workers=WORKERS] [--path=PATH ...] [user_id ...]`
 
 Loop over all files and try to generate previews for them. If one or multiple user ids are supplied
 it will just loop over the files of those users. You can also limit the generation to one or more
-paths using `--path="/[username]/files/[folder path]"`, e.g. `--path="/alice/files/Photos"`. Note
-that all given user_ids are ignored if at least one path is specified.
+paths using `--path="/[username]/files/[folder path]"`, for example,
+`--path="/alice/files/Photos"`. Note that all given user_ids are ignored if at least one path is
+specified.
+
+You can optionally spawn multiple parallel workers to speed up the generation of previews. Simply 
+pass the desired worker count to the `--workers` option, for example, `--workers=10`.
+
+Use `<command> -vv` to get a more verbose output if you are interested to see which files are being
+processed.
 
 #### `preview:pre-generate`
 
 Do the actual pre-generation. This means only for new or modified files (since the app was enabled
-or the last pre-generation was done).
+or the last pre-generation was done). It is possible to run the command multiple times in parallel
+to speed up the generation of previews.
 
 Use `<command> -vv` to get a more verbose output if you are interested to see which files are being
 processed.
@@ -100,11 +108,6 @@ the aspect ratio.
 
 Preview generation can be a very long running job. Thus we need a system that
 does not time out.
-
-### I get "Command already running"
-
-Yes this happens when the `pre-generate` command crashes. No worries the lock
-will be released after 30 minutes of inactivity from the app. So go grab a cookie.
 
 ### What if I'm using Nextcloud All In One?
 
