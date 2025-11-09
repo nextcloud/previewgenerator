@@ -149,6 +149,12 @@ Add an empty file with the name `.nomedia` in the folder you wish to skip. All f
 
 ### I want to reset/regenerate all previews
 
+#### Nextcloud 31 and newer
+
+Run `occ preview:cleanup` on your server. Please have a look at the [documentation](https://docs.nextcloud.com/server/latest/admin_manual/occ_command.html#cleanup-previews) for more information.
+
+#### Nextcloud 30 and older
+
 **WARNING:** This is not supported but it has been confirmed to work by multiple users. Proceed at your own risk. Always keep backups around.
 
 1. Remove the folder `your-nextcloud-data-directory/appdata_*/preview`
