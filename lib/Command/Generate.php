@@ -124,7 +124,6 @@ class Generate extends Command {
 	}
 
 	private function executeCoordinator(InputInterface $input) {
-
 		$workerCount = (int)$input->getOption(self::OPT_WORKERS);
 		if ($workerCount <= 0) {
 			$this->output->writeln("<error>Invalid worker count: $workerCount</error>");
@@ -145,10 +144,9 @@ class Generate extends Command {
 				$workerPids[] = $pid;
 			} else {
 				// Child
-				$argv = $_SERVER['argv'];
 				$env = getenv();
 				$env[self::ENV_WORKER_CONF] = json_encode($workerconfig, JSON_THROW_ON_ERROR);
-				pcntl_exec($argv[0], array_slice($argv, 1), $env);
+				pcntl_exec(PHP_BINARY, $_SERVER['argv'], $env);
 			}
 		}
 
