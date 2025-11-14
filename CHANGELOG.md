@@ -4,6 +4,10 @@
 -->
 # Changelog
 
+## 5.11.0-beta.2 - 2025-11-14
+### Fixed
+- Spawning multiple generate-all workers when occ is not executable
+
 ## 5.11.0-beta.1 - 2025-11-08
 ### Added
 - Allow running multiple instances of pre-generate
