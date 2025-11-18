@@ -4,6 +4,10 @@
 -->
 # Changelog
 
+## 5.11.0-beta.3 - 2025-11-18
+### Fixed
+- Running generate-all with multiple workers skips some files
+
 ## 5.11.0-beta.2 - 2025-11-14
 ### Fixed
 - Spawning multiple generate-all workers when occ is not executable
