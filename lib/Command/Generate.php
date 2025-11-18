@@ -11,6 +11,7 @@ namespace OCA\PreviewGenerator\Command;
 
 use OCA\Files_External\Service\GlobalStoragesService;
 use OCA\PreviewGenerator\Model\WorkerConfig;
+use OCA\PreviewGenerator\Service\ModuloService;
 use OCA\PreviewGenerator\SizeHelper;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
@@ -288,7 +289,7 @@ class Generate extends Command {
 
 		if ($this->workerConfig !== null) {
 			$hash = $this->hashFileId($file->getId());
-			if (($hash % $this->workerConfig->getWorkerCount()) !== $this->workerConfig->getWorkerIndex()) {
+			if (ModuloService::absMod($hash, $this->workerConfig->getWorkerCount()) !== $this->workerConfig->getWorkerIndex()) {
 				return;
 			}
 		}
