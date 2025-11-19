@@ -4,6 +4,15 @@
 -->
 # Changelog
 
+## 5.11.0 - 2025-11-19
+### Added
+- Allow running multiple instances of pre-generate
+- Implement spawning multiple workers for generate-all
+
+### Removed
+- Drop support for Nextcloud 28 and 29
+- Drop support for PHP 8.0
+
 ## 5.10.0 - 2025-09-05
 ### Added
 - Support for Nextcloud 32
