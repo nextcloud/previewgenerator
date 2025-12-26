@@ -99,7 +99,7 @@ class Generate extends Command {
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		if ($this->encryptionManager->isEnabled()) {
-			$output->writeln('Encryption is enabled. Aborted.');
+			$output->writeln('<error>Encryption is enabled. Aborted.</error>');
 			return 1;
 		}
 

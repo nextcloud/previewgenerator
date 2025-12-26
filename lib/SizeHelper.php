@@ -10,12 +10,14 @@ declare(strict_types=1);
 namespace OCA\PreviewGenerator;
 
 use OCA\PreviewGenerator\AppInfo\Application;
+use OCA\PreviewGenerator\Service\ConfigService;
 use OCP\IConfig;
 use OCP\IPreview;
 
 class SizeHelper {
 	public function __construct(
 		private IConfig $config,
+		private ConfigService $configService,
 	) {
 	}
 
@@ -35,8 +37,8 @@ class SizeHelper {
 			'width' => [],
 		];
 
-		$maxW = (int)$this->config->getSystemValue('preview_max_x', 4096);
-		$maxH = (int)$this->config->getSystemValue('preview_max_y', 4096);
+		$maxW = $this->configService->getPreviewMaxX();
+		$maxH = $this->configService->getPreviewMaxY();
 
 		$s = 64;
 		while ($s <= $maxW || $s <= $maxH) {
