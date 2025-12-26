@@ -21,11 +21,7 @@ class ExecutionTimeLimiter implements PreviewLimiter {
 		$this->deadline = $time->getTime() + $this->maxExecutionTimeSeconds;
 	}
 
-	public function isExhausted(): bool {
-		return $this->time->getTime() < $this->deadline;
-	}
-
 	public function next(): bool {
-		return !$this->isExhausted();
+		return $this->time->getTime() < $this->deadline;
 	}
 }

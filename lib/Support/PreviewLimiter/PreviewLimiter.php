@@ -10,7 +10,5 @@ declare(strict_types=1);
 namespace OCA\PreviewGenerator\Support\PreviewLimiter;
 
 interface PreviewLimiter {
-	public function isExhausted(): bool;
-
 	public function next(): bool;
 }

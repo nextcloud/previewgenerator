@@ -17,12 +17,8 @@ class CountLimiter implements PreviewLimiter {
 	) {
 	}
 
-	public function isExhausted(): bool {
-		return $this->previews < $this->maxPreviews;
-	}
-
 	public function next(): bool {
-		if ($this->isExhausted()) {
+		if ($this->previews >= $this->maxPreviews) {
 			return false;
 		}
 

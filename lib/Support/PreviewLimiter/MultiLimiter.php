@@ -18,16 +18,6 @@ class MultiLimiter implements PreviewLimiter {
 	) {
 	}
 
-	public function isExhausted(): bool {
-		foreach ($this->limiters as $limiter) {
-			if ($limiter->isExhausted()) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public function next(): bool {
 		foreach ($this->limiters as $limiter) {
 			if (!$limiter->next()) {
