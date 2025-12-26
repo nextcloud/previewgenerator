@@ -42,12 +42,20 @@ requested before it is pre-generated it will still be shown.
 
 ## How does the app work
 
-1. Listen to events that a file has been written or modified and store it in the database
-2. On cron run request previews for the files that have been written or modified
+1. Listen to events that a file has been written or modified and store it in the database.
+2. Generates previews for the files that have been written or modified in a background job.
+3. Optional: Dedicated occ command to generate previews using a custom schedule (for example, in a
+   separate system cron job).
 
-If a preview already exists at step 2 then requesting it is really cheap. If not
+If a preview already exists at step 2 (or 3) then requesting it is really cheap. If not
 it will be generated. Depending on the sizes of the files and the hardware you
 are running on the time this takes can vary.
+
+By default, the background job to generate previews for modified files is limited to a maximum
+execution time of five minutes. Additionally, it requires using the cron background job mode.
+Webcron and AJAX modes are not supported. The background job is limited to prevent stalling the PHP
+process. The limits are configurable via app configs (see below) or admins can configure a dedicated
+system cron job which runs the `occ preview:pre-generate` command.
 
 ## Commands
 
@@ -101,6 +109,19 @@ the aspect ratio.
 Will retain the aspect ratio and use the specified height. The width will be scaled according to
 the aspect ratio.
 
+#### `occ config:app:set --value=false --type=bool previewgenerator job_disabled`
+Set to true to disable the background job that generates previews by default without having to
+configure a manual system cron job. It is recommended to disable the default background job in case
+a custom system cron entry with `occ preview:pre-generate` is configured (set this config to true).
+
+#### `occ config:app:set --value=600 --type=int previewgenerator job_max_execution_time`
+Limits the maximum execution time in seconds of the preview background job. (A value of zero means
+unlimited.)
+
+#### `occ config:app:set --value=0 --type=int previewgenerator job_max_previews`
+Limits the count of previews to be generated in each execution of the preview background job. (A
+value of zero means unlimited.) Configure one, both or no limit (not recommended!). In case both
+limits are configured, the more restrictive one takes precedence.
 
 ## FAQ
 
