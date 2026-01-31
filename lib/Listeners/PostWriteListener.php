@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\PreviewGenerator\Listeners;
 
+use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Files\Events\Node\NodeWrittenEvent;
@@ -20,8 +21,11 @@ class PostWriteListener implements IEventListener {
 	private IDBConnection $connection;
 	private IUserManager $userManager;
 
-	public function __construct(IDBConnection $connection,
-		IUserManager $userManager) {
+	public function __construct(
+		IDBConnection $connection,
+		IUserManager $userManager,
+		private ITimeFactory $time,
+	) {
 		$this->connection = $connection;
 		$this->userManager = $userManager;
 	}
@@ -60,7 +64,8 @@ class PostWriteListener implements IEventListener {
 		$qb = $this->connection->getQueryBuilder();
 		$qb->insert('preview_generation')
 			->setValue('uid', $qb->createNamedParameter($owner))
-			->setValue('file_id', $qb->createNamedParameter($node->getId()));
+			->setValue('file_id', $qb->createNamedParameter($node->getId()))
+			->setValue('queued_at', $qb->createNamedParameter($this->time->getTime()));
 		$qb->executeStatement();
 	}
 }

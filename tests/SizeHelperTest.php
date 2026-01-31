@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\PreviewGenerator\Tests;
 
+use OCA\PreviewGenerator\Service\ConfigService;
 use OCA\PreviewGenerator\SizeHelper;
 use OCP\IConfig;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,16 +24,16 @@ class SizeHelperTest extends TestCase {
 		parent::setUp();
 
 		$this->config = $this->createMock(IConfig::class);
+		$this->configService = $this->createMock(ConfigService::class);
 
-		$this->sizeHelper = new SizeHelper($this->config);
+		$this->sizeHelper = new SizeHelper($this->config, $this->configService);
 	}
 
 	private function mockMaxDimensions(int $maxW = 4096, int $maxH = 4096): void {
-		$this->config->method('getSystemValue')
-			->willReturnMap([
-				['preview_max_x', 4096, $maxW],
-				['preview_max_y', 4096, $maxH],
-			]);
+		$this->configService->method('getPreviewMaxX')
+			->willReturn($maxW);
+		$this->configService->method('getPreviewMaxY')
+			->willReturn($maxH);
 	}
 
 	public static function provideGenerateSpecificationsData(): array {
