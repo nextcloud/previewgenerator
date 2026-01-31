@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace OCA\PreviewGenerator\Command;
 
+use OC\DB\Exceptions\DbalException;
 use OCA\PreviewGenerator\Service\NoMediaService;
 use OCA\PreviewGenerator\SizeHelper;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\DB\Exception;
 use OCP\Encryption\IManager;
 use OCP\Files\File;
 use OCP\Files\GenericFileException;
@@ -197,6 +199,13 @@ class PreGenerate extends Command {
 				$class = $e::class;
 				$error = $e->getMessage();
 				$this->output->writeln("<error>{$class}: {$error}</error>");
+			} catch (DbalException $e) {
+				// Since the introduction of the oc_previews table, preview duplication caused by
+				// duplicated specifications will cause a UniqueConstraintViolationException. We can
+				// simply ignore this exception here and carry on.
+				if ($e->getReason() !== Exception::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+					throw $e;
+				}
 			}
 		}
 	}
