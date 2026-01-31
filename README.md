@@ -54,8 +54,9 @@ are running on the time this takes can vary.
 By default, the background job to generate previews for modified files is limited to a maximum
 execution time of five minutes. Additionally, it requires using the cron background job mode.
 Webcron and AJAX modes are not supported. The background job is limited to prevent stalling the PHP
-process. The limits are configurable via app configs (see below) or admins can configure a dedicated
-system cron job which runs the `occ preview:pre-generate` command.
+process. The limits are configurable via app configs (see below), or admins can configure a dedicated
+system cron job which runs the `occ preview:pre-generate` command. You can run the
+`occ preview:queue-stats` command to check the performance of your configured preview limit(s).
 
 ## Commands
 
@@ -81,6 +82,14 @@ to speed up the generation of previews.
 
 Use `<command> -vv` to get a more verbose output if you are interested to see which files are being
 processed.
+
+#### `preview:queue-stats`
+
+Display statistics about the pre-generation queue which is being processed by the background job (if
+enabled). If you see a large number of stale previews, you should increase (or remove) the
+configured limits of the background job. Please have a look at the app configs below for more
+information, especially both `job_max_*` configs. Note that the same queue is used in the
+`preview:pre-generation` command which can also be invoked to quickly drain the queue.
 
 ## Available configuration options
 
