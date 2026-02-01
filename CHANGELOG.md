@@ -4,6 +4,14 @@
 -->
 # Changelog
 
+## 5.12.0-beta.2 - 2026-02-01
+### Removed
+- Remove support for Nextcloud 34 (unreleased)
+
+### Fixed
+- Remove leftover var_dump() debugging call
+- Always return an exit code (preview:pre-generate)
+
 ## 5.12.0-beta.1 - 2026-01-31
 ### Added
 - Add support for Nextcloud 34
