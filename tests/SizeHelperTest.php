@@ -19,6 +19,7 @@ class SizeHelperTest extends TestCase {
 	private SizeHelper $sizeHelper;
 
 	private IConfig|MockObject $config;
+	private ConfigService&MockObject $configService;
 
 	public function setUp(): void {
 		parent::setUp();
