@@ -11,9 +11,9 @@
 
 The app does not replace on demand preview generation so if a preview is requested before it is pre-generated it will still be shown.
 The first time you install this app, before using a cron job, you properly want to generate all previews via:
-**./occ preview:generate-all -vvv**
+**occ preview:generate-all -vvv**
 
-**Important**: To enable pre-generation of previews you must add **php /var/www/nextcloud/occ preview:pre-generate** to a system cron job that runs at times of your choosing.]]>
+The preview queue will be processed automatically by a background job if the system cron background job mode is configured in Nextcloud. Additionally, you may run **occ preview:pre-generate -vvv** to a process the queue of pending previews immediately.]]>
 	</description>
 	<version>5.12.0-beta.1</version>
 	<licence>agpl</licence>
