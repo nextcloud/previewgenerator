@@ -51,8 +51,6 @@ class QueueStats extends Command {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		var_dump($input->getOption('interval'));
-
 		$intervals = self::DEFAULT_INTERVALS;
 		if ($input->getOption(self::OPT_INTERVAL)) {
 			$intervals = array_map(
