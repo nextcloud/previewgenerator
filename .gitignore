@@ -3,5 +3,6 @@
 /vendor
 /.php-cs-fixer.cache
 /tests/.phpunit.result.cache
+/tests/coverage
 /build
 .DS_store

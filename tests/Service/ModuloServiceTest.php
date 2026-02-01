@@ -12,7 +12,7 @@ namespace OCA\PreviewGenerator\Tests\Service;
 use OCA\PreviewGenerator\Service\ModuloService;
 use PHPUnit\Framework\TestCase;
 
-class Test extends TestCase {
+class ModuloServiceTest extends TestCase {
 	public static function moduloDataProvider(): array {
 		return [
 			[3, 10, 3],

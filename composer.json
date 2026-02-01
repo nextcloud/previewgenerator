@@ -4,14 +4,15 @@
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
 		"platform": {
-			"php": "7.4"
+			"php": "8.1"
 		}
 	},
 	"scripts": {
 		"cs:fix": "php-cs-fixer fix",
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
 		"lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
-		"test:unit": "phpunit -c tests/phpunit.xml tests"
+		"test:unit": "phpunit -c tests/phpunit.xml tests",
+		"test:unit:coverage": "XDEBUG_MODE=coverage phpunit -c tests/phpunit.xml tests"
 	},
 	"require-dev": {
 		"nextcloud/coding-standard": "^1.0.0",
