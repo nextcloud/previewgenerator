@@ -28,7 +28,7 @@ The preview queue will be processed automatically by a background job if the sys
 	<repository type="git">https://github.com/nextcloud/previewgenerator.git</repository>
 	<dependencies>
 		<php min-version="8.1" max-version="8.5" />
-		<nextcloud min-version="30" max-version="34" />
+		<nextcloud min-version="31" max-version="34" />
 	</dependencies>
 	<background-jobs>
 		<job>OCA\PreviewGenerator\BackgroundJob\PreviewJob</job>
