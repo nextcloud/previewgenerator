@@ -4,6 +4,18 @@
 -->
 # Changelog
 
+## 5.12.0 - 2026-02-07
+### Added
+- Add support for Nextcloud 33
+- Add support for PHP 8.5
+- Implement background job to generate previews
+
+### Changed
+- Migrate preview_generation.id column to bigint
+
+### Fixed
+- Handle UniqueConstraintViolationException gracefully
+
 ## 5.11.0 - 2025-11-19
 ### Added
 - Allow running multiple instances of pre-generate
