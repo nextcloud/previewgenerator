@@ -214,8 +214,8 @@ class Generate extends Command {
 		$userId = $user->getUID();
 		$mounts = $this->globalService->getStorageForAllUsers();
 		foreach ($mounts as $mount) {
-			if (in_array($userId, $mount->getApplicableUsers()) &&
-				$mount->getMountOptions()['previews'] === false
+			if (in_array($userId, $mount->getApplicableUsers())
+				&& $mount->getMountOptions()['previews'] === false
 			) {
 				$userFolder = $this->rootFolder->getUserFolder($userId)->getPath();
 				array_push($mountPaths, $userFolder . $mount->getMountPoint());
