@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\PreviewGenerator\BackgroundJob;
 
+use OCA\PreviewGenerator\Exceptions\EncryptionEnabledException;
 use OCA\PreviewGenerator\Service\ConfigService;
 use OCA\PreviewGenerator\Service\PreGenerateService;
 use OCA\PreviewGenerator\Support\PreviewLimiter\CountLimiter;
@@ -55,6 +56,11 @@ class PreviewJob extends TimedJob {
 
 		$this->preGenerateService->setLogger($this->logger);
 		$this->preGenerateService->setLimiter($this->limiter);
-		$this->preGenerateService->preGenerate();
+
+		try {
+			$this->preGenerateService->preGenerate();
+		} catch (EncryptionEnabledException $e) {
+			// Just skip the job silently
+		}
 	}
 }
