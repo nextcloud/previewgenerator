@@ -11,13 +11,13 @@ namespace OCA\PreviewGenerator\BackgroundJob;
 
 use OCA\PreviewGenerator\Service\ConfigService;
 use OCA\PreviewGenerator\Service\PreGenerateService;
-use OCA\PreviewGenerator\Support\OutputInterfaceLoggerAdapter;
 use OCA\PreviewGenerator\Support\PreviewLimiter\CountLimiter;
 use OCA\PreviewGenerator\Support\PreviewLimiter\ExecutionTimeLimiter;
 use OCA\PreviewGenerator\Support\PreviewLimiter\MultiLimiter;
 use OCA\PreviewGenerator\Support\PreviewLimiter\PreviewLimiter;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
+use Psr\Log\LoggerInterface;
 
 class PreviewJob extends TimedJob {
 	private readonly PreviewLimiter $limiter;
@@ -25,7 +25,7 @@ class PreviewJob extends TimedJob {
 	public function __construct(
 		ITimeFactory $time,
 		private readonly PreGenerateService $preGenerateService,
-		private readonly OutputInterfaceLoggerAdapter $outputInterface,
+		private readonly LoggerInterface $logger,
 		private readonly ConfigService $configService,
 	) {
 		parent::__construct($time);
@@ -53,7 +53,8 @@ class PreviewJob extends TimedJob {
 			return;
 		}
 
+		$this->preGenerateService->setLogger($this->logger);
 		$this->preGenerateService->setLimiter($this->limiter);
-		$this->preGenerateService->preGenerate($this->outputInterface);
+		$this->preGenerateService->preGenerate();
 	}
 }
