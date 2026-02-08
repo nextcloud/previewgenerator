@@ -4,6 +4,13 @@
 -->
 # Changelog
 
+## 5.12.1 - 2026-02-08
+### Changed
+- Allow server-side encryption if the master key is used
+
+### Fixed
+- Handle server-side encryption more gracefully in background job
+
 ## 5.12.0 - 2026-02-07
 ### Added
 - Add support for Nextcloud 33
