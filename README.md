@@ -123,7 +123,7 @@ Set to true to disable the background job that generates previews by default wit
 configure a manual system cron job. It is recommended to disable the default background job in case
 a custom system cron entry with `occ preview:pre-generate` is configured (set this config to true).
 
-#### `occ config:app:set --value=600 --type=integer previewgenerator job_max_execution_time`
+#### `occ config:app:set --value=300 --type=integer previewgenerator job_max_execution_time`
 Limits the maximum execution time in seconds of the preview background job. (A value of zero means
 unlimited.)
 
