@@ -118,16 +118,16 @@ the aspect ratio.
 Will retain the aspect ratio and use the specified height. The width will be scaled according to
 the aspect ratio.
 
-#### `occ config:app:set --value=false --type=bool previewgenerator job_disabled`
+#### `occ config:app:set --value=false --type=boolean previewgenerator job_disabled`
 Set to true to disable the background job that generates previews by default without having to
 configure a manual system cron job. It is recommended to disable the default background job in case
 a custom system cron entry with `occ preview:pre-generate` is configured (set this config to true).
 
-#### `occ config:app:set --value=600 --type=int previewgenerator job_max_execution_time`
+#### `occ config:app:set --value=600 --type=integer previewgenerator job_max_execution_time`
 Limits the maximum execution time in seconds of the preview background job. (A value of zero means
 unlimited.)
 
-#### `occ config:app:set --value=0 --type=int previewgenerator job_max_previews`
+#### `occ config:app:set --value=0 --type=integer previewgenerator job_max_previews`
 Limits the count of previews to be generated in each execution of the preview background job. (A
 value of zero means unlimited.) Configure one, both or no limit (not recommended!). In case both
 limits are configured, the more restrictive one takes precedence.
