@@ -18,7 +18,6 @@ class LoggerInterfaceToOutputAdapter implements LoggerInterface {
 	public function __construct(
 		private readonly OutputInterface $output,
 	) {
-		var_dump($output->getVerbosity());
 	}
 
 	public function emergency(string|Stringable $message, array $context = []): void {
