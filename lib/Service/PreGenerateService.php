@@ -18,7 +18,6 @@ use OCA\PreviewGenerator\Support\PreviewLimiter\PreviewLimiter;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\DB\Exception;
-use OCP\Encryption\IManager;
 use OCP\Files\File;
 use OCP\Files\GenericFileException;
 use OCP\Files\IRootFolder;
@@ -44,7 +43,7 @@ class PreGenerateService {
 		private IPreview $previewGenerator,
 		private IConfig $config,
 		private IDBConnection $connection,
-		private IManager $encryptionManager,
+		private EncryptionService $encryptionService,
 		private ITimeFactory $time,
 		private SizeHelper $sizeHelper,
 		private NoMediaService $noMediaService,
@@ -56,11 +55,11 @@ class PreGenerateService {
 	}
 
 	/**
-	 * @throws EncryptionEnabledException If encryption is enabled.
+	 * @throws EncryptionEnabledException If encryption is enabled without the master key.
 	 */
 	public function preGenerate(OutputInterface $output): void {
-		if ($this->encryptionManager->isEnabled()) {
-			throw new EncryptionEnabledException();
+		if (!$this->encryptionService->isCompatibleWithCurrentEncryption()) {
+			throw new EncryptionEnabledException(EncryptionEnabledException::DEFAULT_MESSAGE);
 		}
 
 		// Set timestamp output

@@ -32,7 +32,7 @@ class PreGenerate extends Command {
 		try {
 			$this->preGenerateService->preGenerate($output);
 		} catch (EncryptionEnabledException $e) {
-			$output->writeln('<error>Encryption is enabled. Aborted.</error>');
+			$output->writeln('<error>' . EncryptionEnabledException::DEFAULT_MESSAGE . '</error>');
 			return 1;
 		}
 
