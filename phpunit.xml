@@ -4,7 +4,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 bootstrap="bootstrap.php"
+		 bootstrap="./tests/Unit/bootstrap.php"
 		 verbose="true"
 		 timeoutForSmallTests="900"
 		 timeoutForMediumTests="900"
@@ -13,18 +13,13 @@
 >
   <coverage>
     <include>
-      <directory suffix=".php">../</directory>
+      <directory suffix=".php">./lib</directory>
     </include>
-    <exclude>
-      <directory suffix=".php">../tests</directory>
-	  <directory suffix=".php">../vendor</directory>
-	  <file>../.php-cs-fixer.dist.php</file>
-    </exclude>
     <report>
-      <html outputDirectory="./coverage"/>
+      <html outputDirectory="./tests/coverage"/>
     </report>
   </coverage>
-  <testsuite name="Preview generator tests">
-    <directory suffix="Test.php">.</directory>
+  <testsuite name="PreviewGenerator unit tests">
+    <directory suffix="Test.php">./tests/Unit</directory>
   </testsuite>
 </phpunit>
