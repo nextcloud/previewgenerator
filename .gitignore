@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 /vendor
-/.php-cs-fixer.cache
-/tests/.phpunit.result.cache
+.php-cs-fixer.cache
+.phpunit.result.cache
 /tests/coverage
 /build
 .DS_store

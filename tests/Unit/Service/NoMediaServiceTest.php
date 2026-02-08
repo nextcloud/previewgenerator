@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\PreviewGenerator\Tests\Service;
+namespace OCA\PreviewGenerator\Tests\Unit\Service;
 
 use OCA\PreviewGenerator\Service\NoMediaService;
 use OCP\Files\File;
