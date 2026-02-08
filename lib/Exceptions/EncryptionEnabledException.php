@@ -10,12 +10,7 @@ declare(strict_types=1);
 namespace OCA\PreviewGenerator\Exceptions;
 
 use Exception;
-use Throwable;
 
 class EncryptionEnabledException extends Exception {
-	public const DEFAULT_MESSAGE = 'Encryption is enabled';
-
-	public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null) {
-		parent::__construct($message ?? self::DEFAULT_MESSAGE, $code, $previous);
-	}
+	public const DEFAULT_MESSAGE = 'Encryption is enabled without the master key';
 }
