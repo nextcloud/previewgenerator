@@ -11,6 +11,8 @@ namespace OCA\PreviewGenerator\Command;
 
 use OCA\PreviewGenerator\Exceptions\EncryptionEnabledException;
 use OCA\PreviewGenerator\Service\PreGenerateService;
+use OCA\PreviewGenerator\Support\LoggerInterfaceToOutputAdapter;
+use OCP\IConfig;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class PreGenerate extends Command {
 	public function __construct(
 		private readonly PreGenerateService $preGenerateService,
+		private readonly IConfig $config,
 	) {
 		parent::__construct();
 	}
@@ -25,12 +28,18 @@ class PreGenerate extends Command {
 	protected function configure(): void {
 		$this
 			->setName('preview:pre-generate')
-			->setDescription('Pre generate only images that have been added or changed since the last regular run');
+			->setDescription('Pre-generate only images that have been added or changed since the last regular run');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
+		// Set timestamp output
+		$formatter = new TimestampFormatter($this->config, $output->getFormatter());
+		$output->setFormatter($formatter);
+
+		$this->preGenerateService->setLogger(new LoggerInterfaceToOutputAdapter($output));
+
 		try {
-			$this->preGenerateService->preGenerate($output);
+			$this->preGenerateService->preGenerate();
 		} catch (EncryptionEnabledException $e) {
 			$output->writeln('<error>Encryption is enabled. Aborted.</error>');
 			return 1;

@@ -10,10 +10,8 @@ declare(strict_types=1);
 namespace OCA\PreviewGenerator\Service;
 
 use OC\DB\Exceptions\DbalException;
-use OCA\PreviewGenerator\Command\TimestampFormatter;
 use OCA\PreviewGenerator\Exceptions\EncryptionEnabledException;
 use OCA\PreviewGenerator\SizeHelper;
-use OCA\PreviewGenerator\Support\OutputInterfaceLoggerAdapter;
 use OCA\PreviewGenerator\Support\PreviewLimiter\PreviewLimiter;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\AppFramework\Utility\ITimeFactory;
@@ -27,7 +25,7 @@ use OCP\IConfig;
 use OCP\IDBConnection;
 use OCP\IPreview;
 use OCP\IUserManager;
-use Symfony\Component\Console\Output\OutputInterface;
+use Psr\Log\LoggerInterface;
 
 class PreGenerateService {
 	use TTransactional;
@@ -35,7 +33,7 @@ class PreGenerateService {
 	/* @return array{width: int, height: int, crop: bool} */
 	private array $specifications;
 
-	private ?OutputInterface $output = null;
+	private ?LoggerInterface $logger = null;
 	private ?PreviewLimiter $limiter = null;
 
 	public function __construct(
@@ -51,6 +49,10 @@ class PreGenerateService {
 	) {
 	}
 
+	public function setLogger(LoggerInterface $logger): void {
+		$this->logger = $logger;
+	}
+
 	public function setLimiter(PreviewLimiter $limiter): void {
 		$this->limiter = $limiter;
 	}
@@ -58,27 +60,17 @@ class PreGenerateService {
 	/**
 	 * @throws EncryptionEnabledException If encryption is enabled.
 	 */
-	public function preGenerate(OutputInterface $output): void {
+	public function preGenerate(): void {
 		if ($this->encryptionManager->isEnabled()) {
 			throw new EncryptionEnabledException();
 		}
 
-		// Set timestamp output
-		if (!($output instanceof OutputInterfaceLoggerAdapter)) {
-			$formatter = new TimestampFormatter($this->config, $output->getFormatter());
-			$output->setFormatter($formatter);
-		}
-
-		$this->output = $output;
-
 		if ($this->limiter) {
-			$output->writeln('Using limiter: ' . get_class($this->limiter));
+			$this->logger?->debug('Using limiter: ' . get_class($this->limiter));
 		}
 
 		$this->specifications = $this->sizeHelper->generateSpecifications();
-		if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERY_VERBOSE) {
-			$output->writeln('Specifications: ' . json_encode($this->specifications));
-		}
+		$this->logger?->debug('Specifications: ' . json_encode($this->specifications));
 		$this->startProcessing();
 	}
 
@@ -163,9 +155,7 @@ class PreGenerateService {
 		}
 
 		if ($this->previewGenerator->isMimeSupported($file->getMimeType())) {
-			if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
-				$this->output->writeln('Generating previews for ' . $file->getPath());
-			}
+			$this->logger?->debug('Generating previews for ' . $file->getPath());
 
 			try {
 				$this->previewGenerator->generatePreviews($file, $this->specifications);
@@ -174,7 +164,7 @@ class PreGenerateService {
 			} catch (\InvalidArgumentException|GenericFileException $e) {
 				$class = $e::class;
 				$error = $e->getMessage();
-				$this->output->writeln("<error>{$class}: {$error}</error>");
+				$this->logger?->error("{$class}: {$error}");
 			} catch (DbalException $e) {
 				// Since the introduction of the oc_previews table, preview duplication caused by
 				// duplicated specifications will cause a UniqueConstraintViolationException. We can
