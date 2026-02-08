@@ -11,11 +11,12 @@ namespace OCA\PreviewGenerator\Command;
 
 use OC\DB\Exceptions\DbalException;
 use OCA\Files_External\Service\GlobalStoragesService;
+use OCA\PreviewGenerator\Exceptions\EncryptionEnabledException;
 use OCA\PreviewGenerator\Model\WorkerConfig;
+use OCA\PreviewGenerator\Service\EncryptionService;
 use OCA\PreviewGenerator\Service\ModuloService;
 use OCA\PreviewGenerator\SizeHelper;
 use OCP\DB\Exception;
-use OCP\Encryption\IManager;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\GenericFileException;
@@ -48,7 +49,7 @@ class Generate extends Command {
 	protected IPreview $previewGenerator;
 	protected IConfig $config;
 	protected OutputInterface $output;
-	protected IManager $encryptionManager;
+	protected EncryptionService $encryptionService;
 	protected SizeHelper $sizeHelper;
 
 	private ?WorkerConfig $workerConfig = null;
@@ -57,7 +58,7 @@ class Generate extends Command {
 		IUserManager $userManager,
 		IPreview $previewGenerator,
 		IConfig $config,
-		IManager $encryptionManager,
+		EncryptionService $encryptionService,
 		ContainerInterface $container,
 		SizeHelper $sizeHelper) {
 		parent::__construct();
@@ -66,7 +67,7 @@ class Generate extends Command {
 		$this->rootFolder = $rootFolder;
 		$this->previewGenerator = $previewGenerator;
 		$this->config = $config;
-		$this->encryptionManager = $encryptionManager;
+		$this->encryptionService = $encryptionService;
 		$this->sizeHelper = $sizeHelper;
 
 		try {
@@ -98,8 +99,8 @@ class Generate extends Command {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		if ($this->encryptionManager->isEnabled()) {
-			$output->writeln('<error>Encryption is enabled. Aborted.</error>');
+		if (!$this->encryptionService->isCompatibleWithCurrentEncryption()) {
+			$output->writeln('<error>' . EncryptionEnabledException::DEFAULT_MESSAGE . '</error>');
 			return 1;
 		}
 
