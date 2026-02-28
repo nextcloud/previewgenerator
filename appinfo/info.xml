@@ -15,7 +15,7 @@ The first time you install this app, before using a cron job, you properly want 
 
 The preview queue will be processed automatically by a background job if the system cron background job mode is configured in Nextcloud. Additionally, you may run **occ preview:pre-generate -vvv** to a process the queue of pending previews immediately.]]>
 	</description>
-	<version>5.13.0-dev.1</version>
+	<version>5.13.0</version>
 	<licence>agpl</licence>
 	<author>Richard Steinmetz</author>
 	<namespace>PreviewGenerator</namespace>
@@ -28,7 +28,7 @@ The preview queue will be processed automatically by a background job if the sys
 	<repository type="git">https://github.com/nextcloud/previewgenerator.git</repository>
 	<dependencies>
 		<php min-version="8.1" max-version="8.5" />
-		<nextcloud min-version="31" max-version="34" />
+		<nextcloud min-version="31" max-version="33" />
 	</dependencies>
 	<background-jobs>
 		<job>OCA\PreviewGenerator\BackgroundJob\PreviewJob</job>
