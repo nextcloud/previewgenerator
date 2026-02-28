@@ -4,6 +4,17 @@
 -->
 # Changelog
 
+## 5.13.0 - 2026-02-28
+### Changed
+- Internal code refactoring and more automated testing
+
+### Fixed
+- Remove leftover var_dump() debugging call
+- Fix bugs related to the refactored logging code
+
+### Removed
+- Drop support for Nextcloud 30 (eol)
+
 ## 5.12.1 - 2026-02-08
 ### Changed
 - Allow server-side encryption if the master key is used
