@@ -102,7 +102,6 @@ class PreGenerateService {
 				return $row;
 			}, $this->connection);
 
-
 			if (!$row) {
 				break;
 			}
