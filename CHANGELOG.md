@@ -4,6 +4,10 @@
 -->
 # Changelog
 
+## 5.14.0 - 2026-06-28
+### Added
+- Add support for Nextcloud 34
+
 ## 5.12.1 - 2026-02-08
 ### Changed
 - Allow server-side encryption if the master key is used
