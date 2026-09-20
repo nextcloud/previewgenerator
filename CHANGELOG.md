@@ -4,6 +4,13 @@
 -->
 # Changelog
 
+## 5.15.0 - 2026-09-20
+### Added
+- Add support for Nextcloud 35
+
+### Removed
+- Drop support for Nextcloud 31, 32 and PHP 8.1 (EOL)
+
 ## 5.14.0 - 2026-06-28
 ### Added
 - Add support for Nextcloud 34
