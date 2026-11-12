@@ -178,14 +178,15 @@ class Generate extends Command {
 	}
 
 	private function executeDefault(InputInterface $input): int {
+		$exitCode = 0;
 		$inputPaths = $input->getOption('path');
 		if ($inputPaths) {
 			foreach ($inputPaths as $inputPath) {
 				$inputPath = '/' . trim($inputPath, '/');
 				[, $userId,] = explode('/', $inputPath, 3);
 				$user = $this->userManager->get($userId);
-				if ($user !== null) {
-					$this->generatePathPreviews($user, $inputPath);
+				if ($user !== null && !$this->generatePathPreviews($user, $inputPath)) {
+					$exitCode = 1;
 				}
 			}
 		} else {
@@ -204,7 +205,7 @@ class Generate extends Command {
 			}
 		}
 
-		return 0;
+		return $exitCode;
 	}
 
 	private function getNoPreviewMountPaths(IUser $user): array {
@@ -225,28 +226,43 @@ class Generate extends Command {
 		return $mountPaths;
 	}
 
-	private function generatePathPreviews(IUser $user, string $path): void {
-		\OC_Util::tearDownFS();
-		\OC_Util::setupFS($user->getUID());
+	/**
+	 * @return bool false if the path is not inside the files folder of the user or does not exist
+	 */
+	private function generatePathPreviews(IUser $user, string $path): bool {
+		$this->setupUserFileSystem($user);
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 		try {
 			$relativePath = $userFolder->getRelativePath($path);
+			if ($relativePath === null) {
+				$this->output->writeln(sprintf(
+					'<error>Path %s is not inside the files folder of user %s</error>',
+					$path,
+					$user->getUID(),
+				));
+				return false;
+			}
+			$pathFolder = $userFolder->get($relativePath);
 		} catch (NotFoundException $e) {
-			$this->output->writeln('Path not found');
-			return;
+			$this->output->writeln(sprintf('<error>Path not found: %s</error>', $path));
+			return false;
 		}
-		$pathFolder = $userFolder->get($relativePath);
 		$noPreviewMountPaths = $this->getNoPreviewMountPaths($user);
 		$this->parseFolder($pathFolder, $noPreviewMountPaths);
+		return true;
 	}
 
 	private function generateUserPreviews(IUser $user): void {
-		\OC_Util::tearDownFS();
-		\OC_Util::setupFS($user->getUID());
+		$this->setupUserFileSystem($user);
 
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 		$noPreviewMountPaths = $this->getNoPreviewMountPaths($user);
 		$this->parseFolder($userFolder, $noPreviewMountPaths);
+	}
+
+	protected function setupUserFileSystem(IUser $user): void {
+		\OC_Util::tearDownFS();
+		\OC_Util::setupFS($user->getUID());
 	}
 
 	private function parseFolder(Folder $folder, array $noPreviewMountPaths): void {
