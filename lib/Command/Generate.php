@@ -229,13 +229,17 @@ class Generate extends Command {
 		\OC_Util::tearDownFS();
 		\OC_Util::setupFS($user->getUID());
 		$userFolder = $this->rootFolder->getUserFolder($user->getUID());
-		try {
-			$relativePath = $userFolder->getRelativePath($path);
-		} catch (NotFoundException $e) {
-			$this->output->writeln('Path not found');
+		$relativePath = $userFolder->getRelativePath($path);
+		if ($relativePath === null) {
+			$this->output->writeln('Path is outside of user\'s files folder: ' . $path);
 			return;
 		}
-		$pathFolder = $userFolder->get($relativePath);
+		try {
+			$pathFolder = $userFolder->get($relativePath);
+		} catch (NotFoundException $e) {
+			$this->output->writeln('Path not found: ' . $path);
+			return;
+		}
 		$noPreviewMountPaths = $this->getNoPreviewMountPaths($user);
 		$this->parseFolder($pathFolder, $noPreviewMountPaths);
 	}
